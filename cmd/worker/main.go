@@ -13,6 +13,7 @@ import (
 
 	"github.com/vineel/vinagents-go/internal/config"
 	"github.com/vineel/vinagents-go/internal/db"
+	"github.com/vineel/vinagents-go/internal/prompt"
 	"github.com/vineel/vinagents-go/internal/repository"
 	"github.com/vineel/vinagents-go/internal/worker"
 
@@ -50,13 +51,28 @@ func main() {
 	// Create repositories
 	agentRunRepo := repository.NewAgentRunRepository(pool)
 	agentRunMessageRepo := repository.NewAgentRunMessageRepository(pool)
+	clauserRepo := repository.NewClauserRepository(pool)
+	clauserOutputRepo := repository.NewClauserOutputRepository(pool)
 
-	// Create worker
+	// Create prompt loader
+	promptLoader := prompt.NewLoader("prompts")
+
+	// Create workers
 	agentRunWorker := worker.NewAgentRunWorker(agentRunRepo, agentRunMessageRepo, anthropicClientPtr)
+	clauserWriteWorker := worker.NewClauserWriteWorker(
+		clauserRepo, clauserOutputRepo, agentRunRepo, agentRunMessageRepo,
+		anthropicClientPtr, promptLoader,
+	)
+	clauserLensWorker := worker.NewClauserLensWorker(
+		clauserRepo, clauserOutputRepo, agentRunRepo, agentRunMessageRepo,
+		anthropicClientPtr, promptLoader,
+	)
 
 	// Create River workers
 	workers := river.NewWorkers()
 	river.AddWorker(workers, agentRunWorker)
+	river.AddWorker(workers, clauserWriteWorker)
+	river.AddWorker(workers, clauserLensWorker)
 
 	// Create River client with workers
 	riverClient, err := river.NewClient(riverpgxv5.New(pool), &river.Config{

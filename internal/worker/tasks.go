@@ -20,6 +20,30 @@ func (AgentRunArgs) Kind() string {
 	return "agent_run"
 }
 
+// ClauserWriteArgs are the arguments for a clause write job
+type ClauserWriteArgs struct {
+	ClauserID    string `json:"clauser_id"`
+	AgentRunID   string `json:"agent_run_id"`
+	Instructions string `json:"instructions,omitempty"`
+}
+
+// Kind returns the job kind for River
+func (ClauserWriteArgs) Kind() string {
+	return "clauser_write"
+}
+
+// ClauserLensArgs are the arguments for a lens analysis job
+type ClauserLensArgs struct {
+	ClauserID  string   `json:"clauser_id"`
+	AgentRunID string   `json:"agent_run_id"`
+	Lenses     []string `json:"lenses"`
+}
+
+// Kind returns the job kind for River
+func (ClauserLensArgs) Kind() string {
+	return "clauser_lens"
+}
+
 // AgentRunWorker handles agent run jobs
 type AgentRunWorker struct {
 	river.WorkerDefaults[AgentRunArgs]

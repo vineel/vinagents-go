@@ -142,3 +142,66 @@ type ListAgentRunsFilters struct {
 	Limit     int
 	Offset    int
 }
+
+// Clauser represents a clause drafting session
+type Clauser struct {
+	ClauserID      string          `json:"clauserId"`
+	UserID         string          `json:"userId"`
+	Title          *string         `json:"title"`
+	AgreementA     *string         `json:"agreementA"`
+	AgreementB     *string         `json:"agreementB"`
+	ClauseA        *string         `json:"clauseA"`
+	ClauseB        *string         `json:"clauseB"`
+	AgentRunID     *string         `json:"agentRunId,omitempty"`
+	ClauseCHistory json.RawMessage `json:"clauseCHistory"`
+	CreatedAt      time.Time       `json:"createdAt"`
+	UpdatedAt      time.Time       `json:"updatedAt"`
+}
+
+// ClauserOutput represents an output from a lens run or clause generation
+type ClauserOutput struct {
+	ClauserOutputID string          `json:"clauserOutputId"`
+	ClauserID       string          `json:"clauserId"`
+	AgentRunID      *string         `json:"agentRunId,omitempty"`
+	Ordinal         int             `json:"ordinal"`
+	GroupName       string          `json:"groupName"`
+	GroupOrdinal    int             `json:"groupOrdinal"`
+	Title           string          `json:"title"`
+	Kind            string          `json:"kind"`
+	Content         json.RawMessage `json:"content"`
+	CreatedAt       time.Time       `json:"createdAt"`
+}
+
+// CreateClauserInput is the input for creating a new clauser
+type CreateClauserInput struct {
+	UserID string
+	Title  *string
+}
+
+// UpdateClauserInput is the input for updating a clauser
+type UpdateClauserInput struct {
+	Title      *string
+	AgreementA *string
+	AgreementB *string
+	ClauseA    *string
+	ClauseB    *string
+	AgentRunID *string
+}
+
+// CreateClauserOutputInput is the input for creating a clauser output
+type CreateClauserOutputInput struct {
+	ClauserID    string
+	AgentRunID   *string
+	Ordinal      int
+	GroupName    string
+	GroupOrdinal int
+	Title        string
+	Kind         string
+	Content      json.RawMessage
+}
+
+// ListClausersFilters filters for listing clausers
+type ListClausersFilters struct {
+	Limit  int
+	Offset int
+}

@@ -62,6 +62,8 @@ func main() {
 	refreshTokenRepo := repository.NewRefreshTokenRepository(pool)
 	agentRunRepo := repository.NewAgentRunRepository(pool)
 	agentRunMessageRepo := repository.NewAgentRunMessageRepository(pool)
+	clauserRepo := repository.NewClauserRepository(pool)
+	clauserOutputRepo := repository.NewClauserOutputRepository(pool)
 
 	// Create JWT manager
 	jwtManager := jwt.NewManager(
@@ -74,15 +76,17 @@ func main() {
 	// Create services
 	authService := service.NewAuthService(userRepo, refreshTokenRepo, jwtManager)
 	agentService := service.NewAgentService(agentRunRepo, agentRunMessageRepo, riverClient, pool)
+	clauserService := service.NewClauserService(clauserRepo, clauserOutputRepo, agentRunRepo, riverClient, pool)
 
 	// Create handlers
 	healthHandler := handler.NewHealthHandler()
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userRepo, jwtManager)
 	agentHandler := handler.NewAgentHandler(agentService)
+	clauserHandler := handler.NewClauserHandler(clauserService)
 
 	// Create router
-	router := setupRouter(cfg, jwtManager, healthHandler, authHandler, userHandler, agentHandler)
+	router := setupRouter(cfg, jwtManager, healthHandler, authHandler, userHandler, agentHandler, clauserHandler)
 
 	// Create server
 	srv := &http.Server{
@@ -138,6 +142,7 @@ func setupRouter(
 	authHandler *handler.AuthHandler,
 	userHandler *handler.UserHandler,
 	agentHandler *handler.AgentHandler,
+	clauserHandler *handler.ClauserHandler,
 ) *gin.Engine {
 	if cfg.IsProduction() {
 		gin.SetMode(gin.ReleaseMode)
@@ -171,6 +176,7 @@ func setupRouter(
 		authMiddleware := middleware.Auth(jwtManager)
 		userHandler.RegisterRoutes(api, authMiddleware)
 		agentHandler.RegisterRoutes(api, authMiddleware)
+		clauserHandler.RegisterRoutes(api, authMiddleware)
 	}
 
 	return router
