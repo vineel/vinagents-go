@@ -1,0 +1,887 @@
+openapi: 3.0.3
+info:
+  title: Clauser API
+  description: |
+    API for the Clauser feature - a tool for lawyers to iterate on contract clauses using AI.
+    Users provide agreements and clause versions, run AI "lenses" for analysis, curate favorites,
+    and generate refined clause drafts.
+  version: 1.0.0
+  contact:
+    name: API Support
+
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local development server
+
+tags:
+  - name: Clausers
+    description: Clause drafting sessions
+  - name: Clauser Fields
+    description: Update individual clauser fields
+  - name: Clauser Actions
+    description: Run AI analysis and generation
+  - name: Favorites
+    description: Manage favorited analysis items
+
+security:
+  - BearerAuth: []
+
+paths:
+  /clausers:
+    post:
+      tags:
+        - Clausers
+      summary: Create a new clauser
+      description: Creates a new clause drafting session for the authenticated user
+      operationId: createClauser
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateClauserRequest'
+      responses:
+        '201':
+          description: Clauser created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+    get:
+      tags:
+        - Clausers
+      summary: List clausers
+      description: Returns a paginated list of clausers for the authenticated user
+      operationId: listClausers
+      parameters:
+        - name: limit
+          in: query
+          description: Maximum number of results to return
+          schema:
+            type: integer
+            default: 20
+            minimum: 1
+            maximum: 100
+        - name: offset
+          in: query
+          description: Number of results to skip
+          schema:
+            type: integer
+            default: 0
+            minimum: 0
+      responses:
+        '200':
+          description: List of clausers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserListResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /clausers/{clauserId}:
+    get:
+      tags:
+        - Clausers
+      summary: Get a clauser
+      description: Returns a single clauser by ID
+      operationId: getClauser
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      responses:
+        '200':
+          description: Clauser details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+    delete:
+      tags:
+        - Clausers
+      summary: Delete a clauser
+      description: Deletes a clauser and all associated outputs
+      operationId: deleteClauser
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      responses:
+        '200':
+          description: Clauser deleted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessMessage'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/title:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update clauser title
+      operationId: updateClauserTitle
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/agreement-a:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Agreement A
+      description: Update the full text of Agreement A (our version)
+      operationId: updateAgreementA
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/agreement-b:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Agreement B
+      description: Update the full text of Agreement B (counterparty version)
+      operationId: updateAgreementB
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/clause-a:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Clause A
+      description: Update Clause A (our version of the clause)
+      operationId: updateClauseA
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/clause-b:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Clause B
+      description: Update Clause B (counterparty version of the clause)
+      operationId: updateClauseB
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/screen:
+    get:
+      tags:
+        - Clausers
+      summary: Get full screen state
+      description: |
+        Returns the complete state needed to render the clauser screen, including:
+        - The clauser with all fields
+        - All outputs (lens analyses, generated clauses)
+        - Favorites
+        - Active run status (if any)
+      operationId: getClauserScreen
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      responses:
+        '200':
+          description: Full screen state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ScreenStateResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/outputs:
+    get:
+      tags:
+        - Clausers
+      summary: Get clauser outputs
+      description: Returns all outputs for a clauser (lens analyses, generated clauses, favorites)
+      operationId: getClauserOutputs
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      responses:
+        '200':
+          description: List of outputs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OutputsResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/run-lenses:
+    post:
+      tags:
+        - Clauser Actions
+      summary: Run lens analysis
+      description: |
+        Triggers an AI analysis job using the specified lenses.
+
+        Available lenses:
+        - `risks` - Identify potential legal, business, or operational risks
+        - `opportunities` - Identify areas where favorable terms could be negotiated
+        - `ambiguities` - Highlight unclear or potentially contested language
+        - `compliance` - Note regulatory or compliance considerations
+        - `enforcement` - Analyze enforceability and practical implementation issues
+        - `market_standard` - Compare against typical market practice
+      operationId: runLenses
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RunLensesRequest'
+      responses:
+        '202':
+          description: Job enqueued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunJobResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: A job is already running for this clauser
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clausers/{clauserId}/rewrite:
+    post:
+      tags:
+        - Clauser Actions
+      summary: Generate a new clause draft
+      description: |
+        Triggers an AI job to generate a new clause (Clause C) that balances
+        the interests represented in Clause A and Clause B, incorporating
+        any favorited analysis items.
+      operationId: rewriteClause
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RewriteRequest'
+      responses:
+        '202':
+          description: Job enqueued
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RunJobResponse'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: A job is already running for this clauser
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /clausers/{clauserId}/outputs/{outputId}/favorite:
+    post:
+      tags:
+        - Favorites
+      summary: Add item to favorites
+      description: Adds an item from a lens output to the favorites collection
+      operationId: addFavorite
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+        - $ref: '#/components/parameters/outputId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddFavoriteRequest'
+      responses:
+        '200':
+          description: Item added to favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/favorites/{index}:
+    delete:
+      tags:
+        - Favorites
+      summary: Remove item from favorites
+      description: Removes an item from favorites by its index
+      operationId: removeFavorite
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+        - name: index
+          in: path
+          required: true
+          description: Zero-based index of the favorite item to remove
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Item removed from favorites
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FavoritesResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT access token obtained from /auth/login
+
+  parameters:
+    clauserId:
+      name: clauserId
+      in: path
+      required: true
+      description: UUID of the clauser
+      schema:
+        type: string
+        format: uuid
+
+    outputId:
+      name: outputId
+      in: path
+      required: true
+      description: UUID of the clauser output
+      schema:
+        type: string
+        format: uuid
+
+  schemas:
+    CreateClauserRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Optional title for the clauser session
+          example: "NDA Indemnification Clause"
+
+    UpdateFieldRequest:
+      type: object
+      required:
+        - value
+      properties:
+        value:
+          type: string
+          description: The new value for the field
+          example: "Party A shall indemnify Party B for all claims arising from breach."
+
+    RunLensesRequest:
+      type: object
+      required:
+        - lenses
+      properties:
+        lenses:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+              - risks
+              - opportunities
+              - ambiguities
+              - compliance
+              - enforcement
+              - market_standard
+          example: ["risks", "opportunities"]
+
+    RewriteRequest:
+      type: object
+      properties:
+        instructions:
+          type: string
+          description: Optional instructions to guide the clause generation
+          example: "Create a balanced clause with mutual indemnification and a liability cap of 2x annual fees"
+
+    AddFavoriteRequest:
+      type: object
+      required:
+        - itemIndex
+      properties:
+        itemIndex:
+          type: integer
+          minimum: 0
+          description: Zero-based index of the item within the output's content.items array
+          example: 0
+
+    Clauser:
+      type: object
+      properties:
+        clauserId:
+          type: string
+          format: uuid
+          description: Unique identifier
+        userId:
+          type: string
+          format: uuid
+          description: Owner user ID
+        title:
+          type: string
+          nullable: true
+          description: Session title
+        agreementA:
+          type: string
+          nullable: true
+          description: Full text of Agreement A (our version)
+        agreementB:
+          type: string
+          nullable: true
+          description: Full text of Agreement B (counterparty version)
+        clauseA:
+          type: string
+          nullable: true
+          description: Clause A (our version)
+        clauseB:
+          type: string
+          nullable: true
+          description: Clause B (counterparty version)
+        agentRunId:
+          type: string
+          format: uuid
+          nullable: true
+          description: ID of currently running job (if any)
+        clauseCHistory:
+          type: array
+          description: History of generated Clause C versions
+          items:
+            $ref: '#/components/schemas/ClauseCHistoryEntry'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClauseCHistoryEntry:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The generated clause text
+        createdAt:
+          type: string
+          format: date-time
+        agentRunId:
+          type: string
+          format: uuid
+
+    ClauserListItem:
+      type: object
+      properties:
+        clauserId:
+          type: string
+          format: uuid
+        title:
+          type: string
+          nullable: true
+        hasClauseC:
+          type: boolean
+          description: Whether any Clause C versions have been generated
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClauserOutput:
+      type: object
+      properties:
+        clauserOutputId:
+          type: string
+          format: uuid
+        agentRunId:
+          type: string
+          format: uuid
+          nullable: true
+        ordinal:
+          type: integer
+          description: Display order
+        groupName:
+          type: string
+          description: Group identifier (e.g., "risks", "opportunities", "clause_c", "favorites")
+        groupOrdinal:
+          type: integer
+        title:
+          type: string
+        kind:
+          type: string
+          enum:
+            - lens_output
+            - clause_draft
+            - favorites
+        content:
+          oneOf:
+            - $ref: '#/components/schemas/LensOutputContent'
+            - $ref: '#/components/schemas/ClauseDraftContent'
+            - $ref: '#/components/schemas/FavoritesContent'
+        createdAt:
+          type: string
+          format: date-time
+
+    LensOutputContent:
+      type: object
+      properties:
+        title:
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/LensItem'
+
+    LensItem:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Brief title for the analysis point
+        body:
+          type: string
+          description: Detailed analysis
+        severity:
+          type: string
+          enum:
+            - low
+            - medium
+            - high
+
+    ClauseDraftContent:
+      type: object
+      properties:
+        text:
+          type: string
+          description: The generated clause text
+
+    FavoritesContent:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FavoriteItem'
+
+    FavoriteItem:
+      type: object
+      properties:
+        sourceOutputId:
+          type: string
+          format: uuid
+          description: ID of the output this item came from
+        sourceItemIndex:
+          type: integer
+          description: Original index in the source output
+        sourceGroupName:
+          type: string
+          description: Group name of the source output
+        title:
+          type: string
+        body:
+          type: string
+
+    ActiveRun:
+      type: object
+      properties:
+        runId:
+          type: string
+          format: uuid
+        status:
+          type: string
+          enum:
+            - pending
+            - running
+            - completed
+            - failed
+            - cancelled
+            - cancel_requested
+        currentStep:
+          type: integer
+        totalSteps:
+          type: integer
+          nullable: true
+
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: integer
+        limit:
+          type: integer
+        offset:
+          type: integer
+
+    ClauserResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          $ref: '#/components/schemas/Clauser'
+
+    ClauserListResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          type: object
+          properties:
+            clausers:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClauserListItem'
+            pagination:
+              $ref: '#/components/schemas/Pagination'
+
+    ScreenStateResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          type: object
+          properties:
+            clauser:
+              $ref: '#/components/schemas/Clauser'
+            outputs:
+              type: array
+              items:
+                $ref: '#/components/schemas/ClauserOutput'
+            favorites:
+              $ref: '#/components/schemas/ClauserOutput'
+              nullable: true
+            activeRun:
+              $ref: '#/components/schemas/ActiveRun'
+              nullable: true
+
+    OutputsResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/ClauserOutput'
+
+    FavoritesResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          $ref: '#/components/schemas/ClauserOutput'
+
+    RunJobResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        data:
+          type: object
+          properties:
+            runId:
+              type: string
+              format: uuid
+            status:
+              type: string
+              example: "pending"
+            pollUrl:
+              type: string
+              description: URL to poll for job status
+              example: "/api/v1/agents/runs/abc123"
+
+    SuccessMessage:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Clauser deleted"
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          description: Error message
+
+  responses:
+    BadRequest:
+      description: Invalid request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Invalid request body: Key: 'value' Error:Field validation failed"
+
+    Unauthorized:
+      description: Missing or invalid authentication
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Unauthorized"
+
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Clauser not found"
+
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            error: "Internal server error"
