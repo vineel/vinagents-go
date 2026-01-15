@@ -1,0 +1,37 @@
+# Binaries
+/api
+/worker
+*.exe
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# Go
+*.test
+coverage.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Frontend (Vite/React)
+node_modules/
+dist/
+.vite/
+*.local
+
+# Logs
+*.log
+logs/
+
+# Temp
+tmp/
+*.tmp
