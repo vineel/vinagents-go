@@ -30,14 +30,16 @@ import (
 
 // TestEnv holds all the test dependencies
 type TestEnv struct {
-	Config       *config.Config
-	Pool         *pgxpool.Pool
-	Router       *gin.Engine
-	JWTManager   *jwt.Manager
-	AuthService  *service.AuthService
-	AgentService *service.AgentService
-	UserRepo     *repository.UserRepository
-	RiverClient  *river.Client[any]
+	Config         *config.Config
+	Pool           *pgxpool.Pool
+	Router         *gin.Engine
+	JWTManager     *jwt.Manager
+	AuthService    *service.AuthService
+	AgentService   *service.AgentService
+	ClauserService *service.ClauserService
+	UserRepo       *repository.UserRepository
+	ClauserRepo    *repository.ClauserRepository
+	RiverClient    *river.Client[any]
 }
 
 // SetupTestEnv creates a new test environment
@@ -80,6 +82,8 @@ func SetupTestEnv(t *testing.T) *TestEnv {
 	refreshTokenRepo := repository.NewRefreshTokenRepository(pool)
 	agentRunRepo := repository.NewAgentRunRepository(pool)
 	agentRunMessageRepo := repository.NewAgentRunMessageRepository(pool)
+	clauserRepo := repository.NewClauserRepository(pool)
+	clauserOutputRepo := repository.NewClauserOutputRepository(pool)
 
 	// Create JWT manager
 	jwtManager := jwt.NewManager(
@@ -92,12 +96,14 @@ func SetupTestEnv(t *testing.T) *TestEnv {
 	// Create services
 	authService := service.NewAuthService(userRepo, refreshTokenRepo, jwtManager)
 	agentService := service.NewAgentService(agentRunRepo, agentRunMessageRepo, riverClient, pool)
+	clauserService := service.NewClauserService(clauserRepo, clauserOutputRepo, agentRunRepo, riverClient, pool)
 
 	// Create handlers
 	healthHandler := handler.NewHealthHandler()
 	authHandler := handler.NewAuthHandler(authService)
 	userHandler := handler.NewUserHandler(userRepo, jwtManager)
 	agentHandler := handler.NewAgentHandler(agentService)
+	clauserHandler := handler.NewClauserHandler(clauserService)
 
 	// Create router
 	gin.SetMode(gin.TestMode)
@@ -112,16 +118,19 @@ func SetupTestEnv(t *testing.T) *TestEnv {
 		authMiddleware := middleware.Auth(jwtManager)
 		userHandler.RegisterRoutes(api, authMiddleware)
 		agentHandler.RegisterRoutes(api, authMiddleware)
+		clauserHandler.RegisterRoutes(api, authMiddleware)
 	}
 
 	env := &TestEnv{
-		Config:       cfg,
-		Pool:         pool,
-		Router:       router,
-		JWTManager:   jwtManager,
-		AuthService:  authService,
-		AgentService: agentService,
-		UserRepo:     userRepo,
+		Config:         cfg,
+		Pool:           pool,
+		Router:         router,
+		JWTManager:     jwtManager,
+		AuthService:    authService,
+		AgentService:   agentService,
+		ClauserService: clauserService,
+		UserRepo:       userRepo,
+		ClauserRepo:    clauserRepo,
 	}
 
 	t.Cleanup(func() {
@@ -137,6 +146,8 @@ func (e *TestEnv) ResetDatabase(t *testing.T) {
 	ctx := context.Background()
 
 	_, err := e.Pool.Exec(ctx, `
+		TRUNCATE TABLE app.clauser_outputs CASCADE;
+		TRUNCATE TABLE app.clausers CASCADE;
 		TRUNCATE TABLE app.agent_run_messages CASCADE;
 		TRUNCATE TABLE app.agent_runs CASCADE;
 		TRUNCATE TABLE app.refresh_tokens CASCADE;
