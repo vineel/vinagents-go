@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/anthropics/anthropic-sdk-go"
@@ -140,6 +142,15 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 			responseText = block.Text
 			break
 		}
+	}
+
+	// Dump raw response to file for debugging
+	dumpFilename := fmt.Sprintf("lens_response_%s.txt", time.Now().Format("20060102_150405"))
+	dumpPath := filepath.Join("output", dumpFilename)
+	if err := os.WriteFile(dumpPath, []byte(responseText), 0644); err != nil {
+		slog.Warn("failed to dump response to file", "error", err, "path", dumpPath)
+	} else {
+		slog.Info("dumped Claude response", "path", dumpPath)
 	}
 
 	// Log token usage

@@ -1,0 +1,82 @@
+```json
+{
+  "alignedClause": "5.3 Security Incident Notice. Provider will notify Customer within seventy-two (72) hours after Provider becomes aware of any Security Incident. Such notice will include, to the extent reasonably available at the time of notification: (a) a description of the Security Incident; (b) the categories and approximate number of affected individuals; (c) the categories and approximate amount of Customer Data affected; (d) the likely consequences; and (e) measures taken or proposed to address and mitigate the Security Incident. Provider will provide material updates within forty-eight (48) hours of any significant developments in containment, eradication, or impact assessment.\n\n5.4 Cooperation and Communications. Provider will reasonably cooperate with Customer's investigation of any Security Incident, including providing reasonably available logs, forensic reports, and access to knowledgeable personnel during normal business hours or as otherwise mutually agreed. Customer will reimburse Provider's reasonable, documented out-of-pocket costs for extraordinary cooperation efforts beyond Provider's standard incident response procedures. Provider will not make any public statement specifically identifying Customer or Customer Data in connection with a Security Incident without Customer's prior written consent, except as required by law. The parties will discuss in good faith the allocation of costs for individual notifications and credit monitoring arising from a Security Incident involving Customer Data, considering the cause, scope, and applicable legal requirements.",
+  "diffSummary": [
+    "Changed notification timing from 24 hours to 72 hours to balance urgency with practical confirmation needs",
+    "Modified update frequency from every 12 hours to material updates within 48 hours of significant developments",
+    "Limited cooperation scope to reasonable efforts with cost reimbursement for extraordinary requests",
+    "Narrowed publicity restriction to statements specifically identifying Customer rather than all public statements",
+    "Changed Provider cost-bearing for notifications to good faith discussion and allocation based on circumstances",
+    "Added 'to the extent reasonably available' qualifier to initial notification requirements"
+  ],
+  "deltaResolutionMap": [
+    {
+      "clauseATreatment": "24-hour notification with comprehensive details",
+      "clauseBTreatment": "5 business day notification with general description",
+      "alignedTreatment": "72-hour notification with reasonably available details",
+      "interestsProtected": "Customer gets prompt notification; Provider gets reasonable confirmation time"
+    },
+    {
+      "clauseATreatment": "Updates every 12 hours until resolution",
+      "clauseBTreatment": "Additional information on commercially reasonable basis",
+      "alignedTreatment": "Material updates within 48 hours of significant developments",
+      "interestsProtected": "Customer gets meaningful updates; Provider avoids administrative burden of routine reporting"
+    },
+    {
+      "clauseATreatment": "Full cooperation with Provider bearing costs",
+      "clauseBTreatment": "Reasonable cooperation with Customer reimbursing extraordinary costs",
+      "alignedTreatment": "Reasonable cooperation with Customer reimbursing documented extraordinary costs",
+      "interestsProtected": "Customer gets needed cooperation; Provider gets cost protection for unusual requests"
+    },
+    {
+      "clauseATreatment": "No public statements about Security Incidents involving Customer Data",
+      "clauseBTreatment": "May make statements that don't identify Customer",
+      "alignedTreatment": "No statements specifically identifying Customer without consent",
+      "interestsProtected": "Customer privacy protected; Provider can discuss general security practices"
+    },
+    {
+      "clauseATreatment": "Provider bears all notification and credit monitoring costs",
+      "clauseBTreatment": "Silent on cost allocation",
+      "alignedTreatment": "Good faith discussion of cost allocation based on circumstances",
+      "interestsProtected": "Equitable cost sharing based on fault and legal requirements rather than automatic allocation"
+    }
+  ],
+  "dependentEdits": "None required - existing Security Incident definition in Section 1.3 is adequate and clause references existing Customer Data definition",
+  "frictionForecast": {
+    "score": 6,
+    "objections": [
+      {
+        "objection": "72-hour notification is too slow for serious security incidents",
+        "response": "72 hours balances urgency with accuracy - premature notifications with incomplete information can cause more harm than good. This aligns with GDPR's 72-hour standard and allows proper incident confirmation.",
+        "concessionLever": "Could agree to 48 hours for incidents involving Social Security numbers or payment card data"
+      },
+      {
+        "objection": "Cost reimbursement for cooperation creates friction and delays",
+        "response": "Cost reimbursement only applies to extraordinary requests beyond standard incident response - routine cooperation remains Provider's obligation. This prevents abuse while ensuring reasonable cooperation.",
+        "concessionLever": "Could cap reimbursement at reasonable hourly rates for personnel time"
+      },
+      {
+        "objection": "Good faith cost discussion for notifications is too vague",
+        "response": "Cost allocation should depend on incident cause and legal requirements rather than automatic Provider liability. Good faith discussion allows fair allocation based on actual circumstances.",
+        "concessionLever": "Could specify that Provider bears costs for incidents caused by Provider's negligence"
+      },
+      {
+        "objection": "Material updates standard is too subjective",
+        "response": "Material updates standard focuses on meaningful developments rather than administrative check-ins. This ensures Customer gets important information without overwhelming both parties with routine status calls.",
+        "concessionLever": "Could define material updates as changes to impact assessment, containment status, or remediation timeline"
+      }
+    ]
+  },
+  "negotiationNotesInternal": "Priority stack: (1) Reasonable notification timing that allows proper incident assessment, (2) Cost protection for extraordinary cooperation requests, (3) Equitable cost sharing for breach notifications. The 72-hour notification timing is defensible based on regulatory standards and operational reality. Push back on automatic cost-bearing - breach notification costs can be substantial and should be allocated based on fault/legal requirements. The cooperation cost reimbursement is reasonable and prevents Customer from creating unlimited cost exposure through excessive investigation demands. Fallback positions: Could accept 48-hour notification for specific data types, could agree to Provider cost-bearing for Provider-caused incidents. Risk flags: Customer may have regulatory notification requirements that drive the 24-hour preference - explore their specific compliance needs.",
+  "negotiationNotesExternal": "The aligned approach balances both parties' legitimate interests while establishing a workable incident response framework. The 72-hour notification timeline follows industry standards (including GDPR) and ensures accurate, helpful information rather than preliminary alerts that may cause unnecessary alarm. The cooperation framework ensures Customer gets needed support while protecting Provider from unlimited cost exposure for extensive investigation requests. Cost allocation for breach notifications should be discussed based on the actual circumstances rather than predetermined - this creates fairness and appropriate incentives for both parties to maintain strong security practices.",
+  "implementationNotes": [
+    "Establish incident detection and escalation procedures to support 72-hour notification timeline",
+    "Develop incident notification templates that capture required information elements (categories of data, affected individuals, consequences, remediation measures)",
+    "Define internal criteria for 'material updates' and significant developments to ensure consistent communication",
+    "Create process for tracking and documenting cooperation costs that exceed standard incident response procedures",
+    "Establish approval workflow for any public communications that might reference customer security incidents",
+    "Maintain documentation of incident response activities to support cost allocation discussions if needed"
+  ],
+  "openIssues": "Need to understand Customer's specific regulatory notification requirements (healthcare, financial services, etc.) that may drive shorter notification timelines. Also unclear if Customer has existing incident response procedures that would affect cooperation requirements."
+}
+```
