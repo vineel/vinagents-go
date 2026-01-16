@@ -33,7 +33,7 @@ func (l *Loader) Load(name string) (*template.Template, error) {
 	}
 	l.mu.RUnlock()
 
-	filename := name + ".prompt.tpl"
+	filename := name + ".prompt.tmpl"
 	path := filepath.Join(l.promptsDir, filename)
 
 	content, err := os.ReadFile(path)

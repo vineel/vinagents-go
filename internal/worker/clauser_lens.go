@@ -127,7 +127,8 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 	}
 
 	// Dump hydrated prompt to file for debugging
-	promptFilename := fmt.Sprintf("lens_prompt_%s.txt", time.Now().Format("20060102_150405"))
+	timestamp := time.Now().Format("20060102_150405")
+	promptFilename := fmt.Sprintf("lens_%s_1_prompt.txt", timestamp)
 	promptPath := filepath.Join("output", promptFilename)
 	if err := os.WriteFile(promptPath, []byte(promptText), 0644); err != nil {
 		slog.Warn("failed to dump prompt to file", "error", err, "path", promptPath)
@@ -159,12 +160,12 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 	}
 
 	// Dump raw response to file for debugging
-	dumpFilename := fmt.Sprintf("lens_response_%s.txt", time.Now().Format("20060102_150405"))
-	dumpPath := filepath.Join("output", dumpFilename)
-	if err := os.WriteFile(dumpPath, []byte(responseText), 0644); err != nil {
-		slog.Warn("failed to dump response to file", "error", err, "path", dumpPath)
+	responseFilename := fmt.Sprintf("lens_%s_2_response.txt", timestamp)
+	responsePath := filepath.Join("output", responseFilename)
+	if err := os.WriteFile(responsePath, []byte(responseText), 0644); err != nil {
+		slog.Warn("failed to dump response to file", "error", err, "path", responsePath)
 	} else {
-		slog.Info("dumped Claude response", "path", dumpPath)
+		slog.Info("dumped Claude response", "path", responsePath)
 	}
 
 	// Log token usage

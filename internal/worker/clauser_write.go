@@ -128,7 +128,8 @@ func (w *ClauserWriteWorker) execute(ctx context.Context, args ClauserWriteArgs)
 	}
 
 	// Dump hydrated prompt to file for debugging
-	promptFilename := fmt.Sprintf("write_prompt_%s.txt", time.Now().Format("20060102_150405"))
+	timestamp := time.Now().Format("20060102_150405")
+	promptFilename := fmt.Sprintf("write_%s_1_prompt.txt", timestamp)
 	promptPath := filepath.Join("output", promptFilename)
 	if err := os.WriteFile(promptPath, []byte(promptText), 0644); err != nil {
 		slog.Warn("failed to dump prompt to file", "error", err, "path", promptPath)
@@ -160,7 +161,7 @@ func (w *ClauserWriteWorker) execute(ctx context.Context, args ClauserWriteArgs)
 	}
 
 	// Dump raw response to file for debugging
-	responseFilename := fmt.Sprintf("write_response_%s.txt", time.Now().Format("20060102_150405"))
+	responseFilename := fmt.Sprintf("write_%s_2_response.txt", timestamp)
 	responsePath := filepath.Join("output", responseFilename)
 	if err := os.WriteFile(responsePath, []byte(clauseText), 0644); err != nil {
 		slog.Warn("failed to dump response to file", "error", err, "path", responsePath)

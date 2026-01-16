@@ -29,9 +29,14 @@ There should be 5 more text columns in the clausers table.
 Step 2
 Add update functions to the API for each of these columns.
 
+Step 2.5 write tests for these handlers
+
 Step 3
 All of these columns must be supplied to the context for the templates in the workers clauser_lens.go and clauser_write.go.
 
 Step 4
 Clause Lens should ALSO output the fully-hydrated prompt to a timestamp file, so I can debug the claude prompt AND the claude response.
 
+Step 5
+For clause writer, add the new fields as context. do NOT add blocks for them if they are blank.
+-------------------
