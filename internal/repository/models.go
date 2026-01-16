@@ -145,17 +145,22 @@ type ListAgentRunsFilters struct {
 
 // Clauser represents a clause drafting session
 type Clauser struct {
-	ClauserID      string          `json:"clauserId"`
-	UserID         string          `json:"userId"`
-	Title          *string         `json:"title"`
-	AgreementA     *string         `json:"agreementA"`
-	AgreementB     *string         `json:"agreementB"`
-	ClauseA        *string         `json:"clauseA"`
-	ClauseB        *string         `json:"clauseB"`
-	AgentRunID     *string         `json:"agentRunId,omitempty"`
-	ClauseCHistory json.RawMessage `json:"clauseCHistory"`
-	CreatedAt      time.Time       `json:"createdAt"`
-	UpdatedAt      time.Time       `json:"updatedAt"`
+	ClauserID             string          `json:"clauserId"`
+	UserID                string          `json:"userId"`
+	Title                 *string         `json:"title"`
+	AgreementA            *string         `json:"agreementA"`
+	AgreementB            *string         `json:"agreementB"`
+	ClauseA               *string         `json:"clauseA"`
+	ClauseB               *string         `json:"clauseB"`
+	RepresentedParty      *string         `json:"representedParty"`
+	DraftingApproach      *string         `json:"draftingApproach"`
+	Playbook              *string         `json:"playbook"`
+	CounterpartyRationale *string         `json:"counterpartyRationale"`
+	BusinessContext       *string         `json:"businessContext"`
+	AgentRunID            *string         `json:"agentRunId,omitempty"`
+	ClauseCHistory        json.RawMessage `json:"clauseCHistory"`
+	CreatedAt             time.Time       `json:"createdAt"`
+	UpdatedAt             time.Time       `json:"updatedAt"`
 }
 
 // ClauserOutput represents an output from a lens run or clause generation
@@ -180,12 +185,17 @@ type CreateClauserInput struct {
 
 // UpdateClauserInput is the input for updating a clauser
 type UpdateClauserInput struct {
-	Title      *string
-	AgreementA *string
-	AgreementB *string
-	ClauseA    *string
-	ClauseB    *string
-	AgentRunID *string
+	Title                 *string
+	AgreementA            *string
+	AgreementB            *string
+	ClauseA               *string
+	ClauseB               *string
+	RepresentedParty      *string
+	DraftingApproach      *string
+	Playbook              *string
+	CounterpartyRationale *string
+	BusinessContext       *string
+	AgentRunID            *string
 }
 
 // CreateClauserOutputInput is the input for creating a clauser output

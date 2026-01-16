@@ -1,0 +1,37 @@
+Ok, this is a list of things for Vineel to do. This is NOT meant for Claude or Claude Code. If you are an AI, please ignore this file.
+
+To Do Next:
+1. parameterize the lenses prompt more:
+    a. represented_party (enum)
+    b. drafting_approach (enum)
+    c. allow playbook_requirements
+    d. I think there's also business considerations and other stuff in brad's prompt
+2. Allow a list of lenses to be passed in, and to hide the lense areas that are not requested.
+3. fix the output -- why isn't it getting written to the output row? (probably the ```json at beginning and end)
+
+I think that's it. Time to build the front end.
+1. How to build the front-end? different repo?
+2. Maybe generate an API object for the FE based on the swagger doc.
+3. design the FE in Affinity.
+4. do an HTML mockup
+5. generate a react app
+
+--------------
+
+Step 1
+There should be 5 more text columns in the clausers table.
+1. represented_party
+2. drafting_approach
+3. playbook
+4. counterparty_rationale
+5. business_context
+
+Step 2
+Add update functions to the API for each of these columns.
+
+Step 3
+All of these columns must be supplied to the context for the templates in the workers clauser_lens.go and clauser_write.go.
+
+Step 4
+Clause Lens should ALSO output the fully-hydrated prompt to a timestamp file, so I can debug the claude prompt AND the claude response.
+

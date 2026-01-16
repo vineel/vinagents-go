@@ -18,6 +18,13 @@ CREATE TABLE app.clausers (
 
 CREATE INDEX idx_clausers_user_id ON app.clausers(user_id);
 
+ALTER TABLE app.clausers
+    ADD COLUMN IF NOT EXISTS represented_party      text,
+    ADD COLUMN IF NOT EXISTS drafting_approach       text,
+    ADD COLUMN IF NOT EXISTS playbook                text,
+    ADD COLUMN IF NOT EXISTS counterparty_rationale  text,
+    ADD COLUMN IF NOT EXISTS business_context        text;
+
 -- Clauser outputs table (immutable - no updated_at)
 CREATE TABLE app.clauser_outputs (
     clauser_output_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

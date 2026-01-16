@@ -25,6 +25,7 @@ func (r *ClauserRepository) Create(ctx context.Context, input CreateClauserInput
 		INSERT INTO app.clausers (user_id, title)
 		VALUES ($1, $2)
 		RETURNING clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		          represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		          agent_run_id, clause_c_history, created_at, updated_at
 	`
 	return r.scanClauser(r.pool.QueryRow(ctx, query, input.UserID, input.Title))
@@ -33,6 +34,7 @@ func (r *ClauserRepository) Create(ctx context.Context, input CreateClauserInput
 func (r *ClauserRepository) FindByID(ctx context.Context, clauserID string) (*Clauser, error) {
 	query := `
 		SELECT clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		       represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		       agent_run_id, clause_c_history, created_at, updated_at
 		FROM app.clausers
 		WHERE clauser_id = $1
@@ -43,6 +45,7 @@ func (r *ClauserRepository) FindByID(ctx context.Context, clauserID string) (*Cl
 func (r *ClauserRepository) FindByIDAndUserID(ctx context.Context, clauserID, userID string) (*Clauser, error) {
 	query := `
 		SELECT clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		       represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		       agent_run_id, clause_c_history, created_at, updated_at
 		FROM app.clausers
 		WHERE clauser_id = $1 AND user_id = $2
@@ -58,6 +61,7 @@ func (r *ClauserRepository) FindByUserID(ctx context.Context, userID string, fil
 
 	query := `
 		SELECT clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		       represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		       agent_run_id, clause_c_history, created_at, updated_at
 		FROM app.clausers
 		WHERE user_id = $1
@@ -120,6 +124,31 @@ func (r *ClauserRepository) Update(ctx context.Context, clauserID string, input 
 		params = append(params, *input.ClauseB)
 		paramIndex++
 	}
+	if input.RepresentedParty != nil {
+		fields = append(fields, fmt.Sprintf("represented_party = $%d", paramIndex))
+		params = append(params, *input.RepresentedParty)
+		paramIndex++
+	}
+	if input.DraftingApproach != nil {
+		fields = append(fields, fmt.Sprintf("drafting_approach = $%d", paramIndex))
+		params = append(params, *input.DraftingApproach)
+		paramIndex++
+	}
+	if input.Playbook != nil {
+		fields = append(fields, fmt.Sprintf("playbook = $%d", paramIndex))
+		params = append(params, *input.Playbook)
+		paramIndex++
+	}
+	if input.CounterpartyRationale != nil {
+		fields = append(fields, fmt.Sprintf("counterparty_rationale = $%d", paramIndex))
+		params = append(params, *input.CounterpartyRationale)
+		paramIndex++
+	}
+	if input.BusinessContext != nil {
+		fields = append(fields, fmt.Sprintf("business_context = $%d", paramIndex))
+		params = append(params, *input.BusinessContext)
+		paramIndex++
+	}
 	if input.AgentRunID != nil {
 		fields = append(fields, fmt.Sprintf("agent_run_id = $%d", paramIndex))
 		params = append(params, *input.AgentRunID)
@@ -136,6 +165,7 @@ func (r *ClauserRepository) Update(ctx context.Context, clauserID string, input 
 		SET %s
 		WHERE clauser_id = $%d
 		RETURNING clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		          represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		          agent_run_id, clause_c_history, created_at, updated_at
 	`, strings.Join(fields, ", "), paramIndex)
 
@@ -145,11 +175,16 @@ func (r *ClauserRepository) Update(ctx context.Context, clauserID string, input 
 // UpdateField updates a single text field on a clauser
 func (r *ClauserRepository) UpdateField(ctx context.Context, clauserID, fieldName, value string) (*Clauser, error) {
 	allowedFields := map[string]bool{
-		"title":       true,
-		"agreement_a": true,
-		"agreement_b": true,
-		"clause_a":    true,
-		"clause_b":    true,
+		"title":                  true,
+		"agreement_a":            true,
+		"agreement_b":            true,
+		"clause_a":               true,
+		"clause_b":               true,
+		"represented_party":      true,
+		"drafting_approach":      true,
+		"playbook":               true,
+		"counterparty_rationale": true,
+		"business_context":       true,
 	}
 
 	if !allowedFields[fieldName] {
@@ -161,6 +196,7 @@ func (r *ClauserRepository) UpdateField(ctx context.Context, clauserID, fieldNam
 		SET %s = $1
 		WHERE clauser_id = $2
 		RETURNING clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		          represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		          agent_run_id, clause_c_history, created_at, updated_at
 	`, fieldName)
 
@@ -174,6 +210,7 @@ func (r *ClauserRepository) AppendClauseCHistory(ctx context.Context, clauserID 
 		SET clause_c_history = clause_c_history || $1::jsonb
 		WHERE clauser_id = $2
 		RETURNING clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		          represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		          agent_run_id, clause_c_history, created_at, updated_at
 	`
 	return r.scanClauser(r.pool.QueryRow(ctx, query, entry, clauserID))
@@ -186,6 +223,7 @@ func (r *ClauserRepository) SetAgentRunID(ctx context.Context, clauserID string,
 		SET agent_run_id = $1
 		WHERE clauser_id = $2
 		RETURNING clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
+		          represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		          agent_run_id, clause_c_history, created_at, updated_at
 	`
 	return r.scanClauser(r.pool.QueryRow(ctx, query, agentRunID, clauserID))
@@ -213,6 +251,11 @@ func (r *ClauserRepository) scanClauser(row pgx.Row) (*Clauser, error) {
 		&c.AgreementB,
 		&c.ClauseA,
 		&c.ClauseB,
+		&c.RepresentedParty,
+		&c.DraftingApproach,
+		&c.Playbook,
+		&c.CounterpartyRationale,
+		&c.BusinessContext,
 		&c.AgentRunID,
 		&c.ClauseCHistory,
 		&c.CreatedAt,
@@ -237,6 +280,11 @@ func (r *ClauserRepository) scanClauserFromRows(rows pgx.Rows) (*Clauser, error)
 		&c.AgreementB,
 		&c.ClauseA,
 		&c.ClauseB,
+		&c.RepresentedParty,
+		&c.DraftingApproach,
+		&c.Playbook,
+		&c.CounterpartyRationale,
+		&c.BusinessContext,
 		&c.AgentRunID,
 		&c.ClauseCHistory,
 		&c.CreatedAt,
