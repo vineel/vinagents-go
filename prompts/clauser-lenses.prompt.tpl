@@ -151,7 +151,32 @@ Generate a list of diplomatic, sendable explanations to counterparty about why c
   ]
 }
 
-## Output Format
+## Open Issues
+Generate a list of missing facts that materially affect clause_c. If there are none, leave the array empty.
+
+{
+  "openIssues": [
+    {
+      priority: "low, medium, or high",
+      text: "the text of the missing fact"
+    }
+  ]
+}
+
+## Dependent Edits
+Generate a list of any strictly required follow-on edits to definitions or cross-references needed to keep the document internally consistent with clause_c. Do not suggest optional or strategic edits. If no such edits are required, leave the array empty.
+
+{
+  "dependentEdits": [
+      {
+        "priority": "low, medium, or high",
+        "text": "the text of edit",
+        "location": "the location of the edit in the document. Be as specific as you can accurately be, but err on the side of accuracy instead of precision"
+      }
+  ]
+}
+
+## Output Format (JSON Shape)
 
 The output must follow these rules EXACTLY
 * valid, machine readable JSON
@@ -192,6 +217,7 @@ The output must follow these rules EXACTLY
   ],
   "internal_negotation_notes": [
     {
+      "priority":"",
       "text": "",
       "notes": [
         ""
@@ -207,7 +233,21 @@ The output must follow these rules EXACTLY
   "external_negotation_notes": [
     priority: "",
     text: ""
+  ],
+  "openIssues": [
+    {
+      priority: "",
+      text: ""
+    }
+  ],
+  "dependentEdits": [
+      {
+        "priority": "",
+        "text": "",
+        "location": ""
+      }
   ]
+  
 }
 
 Important:
