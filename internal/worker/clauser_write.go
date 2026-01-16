@@ -106,12 +106,17 @@ func (w *ClauserWriteWorker) execute(ctx context.Context, args ClauserWriteArgs)
 
 	// Build prompt data
 	data := prompt.ClauserWriteData{
-		AgreementA:   deref(clauser.AgreementA),
-		AgreementB:   deref(clauser.AgreementB),
-		ClauseA:      deref(clauser.ClauseA),
-		ClauseB:      deref(clauser.ClauseB),
-		Favorites:    favorites,
-		Instructions: args.Instructions,
+		AgreementA:            deref(clauser.AgreementA),
+		AgreementB:            deref(clauser.AgreementB),
+		ClauseA:               deref(clauser.ClauseA),
+		ClauseB:               deref(clauser.ClauseB),
+		RepresentedParty:      deref(clauser.RepresentedParty),
+		DraftingApproach:      deref(clauser.DraftingApproach),
+		Playbook:              deref(clauser.Playbook),
+		CounterpartyRationale: deref(clauser.CounterpartyRationale),
+		BusinessContext:       deref(clauser.BusinessContext),
+		Favorites:             favorites,
+		Instructions:          args.Instructions,
 	}
 
 	// Execute prompt template

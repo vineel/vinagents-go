@@ -107,12 +107,17 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 
 	// Build prompt data
 	data := prompt.ClauserLensData{
-		AgreementA: deref(clauser.AgreementA),
-		AgreementB: deref(clauser.AgreementB),
-		ClauseA:    deref(clauser.ClauseA),
-		ClauseB:    deref(clauser.ClauseB),
-		Favorites:  favorites,
-		Lenses:     args.Lenses,
+		AgreementA:            deref(clauser.AgreementA),
+		AgreementB:            deref(clauser.AgreementB),
+		ClauseA:               deref(clauser.ClauseA),
+		ClauseB:               deref(clauser.ClauseB),
+		RepresentedParty:      deref(clauser.RepresentedParty),
+		DraftingApproach:      deref(clauser.DraftingApproach),
+		Playbook:              deref(clauser.Playbook),
+		CounterpartyRationale: deref(clauser.CounterpartyRationale),
+		BusinessContext:       deref(clauser.BusinessContext),
+		Favorites:             favorites,
+		Lenses:                args.Lenses,
 	}
 
 	// Execute prompt template

@@ -77,22 +77,32 @@ func (l *Loader) ClearCache() {
 
 // ClauserWriteData is the data structure for the clause write prompt
 type ClauserWriteData struct {
-	AgreementA   string
-	AgreementB   string
-	ClauseA      string
-	ClauseB      string
-	Favorites    []FavoriteItem
-	Instructions string
+	AgreementA            string
+	AgreementB            string
+	ClauseA               string
+	ClauseB               string
+	RepresentedParty      string
+	DraftingApproach      string
+	Playbook              string
+	CounterpartyRationale string
+	BusinessContext       string
+	Favorites             []FavoriteItem
+	Instructions          string
 }
 
 // ClauserLensData is the data structure for the lens analysis prompt
 type ClauserLensData struct {
-	AgreementA string
-	AgreementB string
-	ClauseA    string
-	ClauseB    string
-	Favorites  []FavoriteItem
-	Lenses     []string
+	AgreementA            string
+	AgreementB            string
+	ClauseA               string
+	ClauseB               string
+	RepresentedParty      string
+	DraftingApproach      string
+	Playbook              string
+	CounterpartyRationale string
+	BusinessContext       string
+	Favorites             []FavoriteItem
+	Lenses                []string
 }
 
 // FavoriteItem represents a favorited output item
