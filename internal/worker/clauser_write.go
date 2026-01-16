@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/anthropics/anthropic-sdk-go"
@@ -125,6 +127,15 @@ func (w *ClauserWriteWorker) execute(ctx context.Context, args ClauserWriteArgs)
 		return fmt.Errorf("failed to execute prompt template: %w", err)
 	}
 
+	// Dump hydrated prompt to file for debugging
+	promptFilename := fmt.Sprintf("write_prompt_%s.txt", time.Now().Format("20060102_150405"))
+	promptPath := filepath.Join("output", promptFilename)
+	if err := os.WriteFile(promptPath, []byte(promptText), 0644); err != nil {
+		slog.Warn("failed to dump prompt to file", "error", err, "path", promptPath)
+	} else {
+		slog.Info("dumped hydrated prompt", "path", promptPath)
+	}
+
 	w.logMessage(ctx, args.AgentRunID, "info", "Calling Claude API", nil)
 
 	// Call Claude
@@ -146,6 +157,15 @@ func (w *ClauserWriteWorker) execute(ctx context.Context, args ClauserWriteArgs)
 			clauseText = block.Text
 			break
 		}
+	}
+
+	// Dump raw response to file for debugging
+	responseFilename := fmt.Sprintf("write_response_%s.txt", time.Now().Format("20060102_150405"))
+	responsePath := filepath.Join("output", responseFilename)
+	if err := os.WriteFile(responsePath, []byte(clauseText), 0644); err != nil {
+		slog.Warn("failed to dump response to file", "error", err, "path", responsePath)
+	} else {
+		slog.Info("dumped Claude response", "path", responsePath)
 	}
 
 	// Log token usage

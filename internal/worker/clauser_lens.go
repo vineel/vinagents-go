@@ -126,6 +126,15 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 		return fmt.Errorf("failed to execute prompt template: %w", err)
 	}
 
+	// Dump hydrated prompt to file for debugging
+	promptFilename := fmt.Sprintf("lens_prompt_%s.txt", time.Now().Format("20060102_150405"))
+	promptPath := filepath.Join("output", promptFilename)
+	if err := os.WriteFile(promptPath, []byte(promptText), 0644); err != nil {
+		slog.Warn("failed to dump prompt to file", "error", err, "path", promptPath)
+	} else {
+		slog.Info("dumped hydrated prompt", "path", promptPath)
+	}
+
 	w.logMessage(ctx, args.AgentRunID, "info", "Calling Claude API for lens analysis", nil)
 
 	// Call Claude
