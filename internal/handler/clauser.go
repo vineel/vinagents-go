@@ -148,6 +148,26 @@ func (h *ClauserHandler) UpdateTitle(c *gin.Context) {
 	h.updateField(c, "title")
 }
 
+func (h *ClauserHandler) UpdateRepresentedParty(c *gin.Context) {
+	h.updateField(c, "represented_party")
+}
+
+func (h *ClauserHandler) UpdateDraftingApproach(c *gin.Context) {
+	h.updateField(c, "drafting_approach")
+}
+
+func (h *ClauserHandler) UpdatePlaybook(c *gin.Context) {
+	h.updateField(c, "playbook")
+}
+
+func (h *ClauserHandler) UpdateCounterpartyRationale(c *gin.Context) {
+	h.updateField(c, "counterparty_rationale")
+}
+
+func (h *ClauserHandler) UpdateBusinessContext(c *gin.Context) {
+	h.updateField(c, "business_context")
+}
+
 func (h *ClauserHandler) updateField(c *gin.Context, fieldName string) {
 	authUser := middleware.MustGetAuthUser(c)
 	clauserID := c.Param("id")
@@ -306,6 +326,11 @@ func (h *ClauserHandler) RegisterRoutes(rg *gin.RouterGroup, authMiddleware gin.
 		clausers.PUT("/:id/clause-a", h.UpdateClauseA)
 		clausers.PUT("/:id/clause-b", h.UpdateClauseB)
 		clausers.PUT("/:id/title", h.UpdateTitle)
+		clausers.PUT("/:id/represented-party", h.UpdateRepresentedParty)
+		clausers.PUT("/:id/drafting-approach", h.UpdateDraftingApproach)
+		clausers.PUT("/:id/playbook", h.UpdatePlaybook)
+		clausers.PUT("/:id/counterparty-rationale", h.UpdateCounterpartyRationale)
+		clausers.PUT("/:id/business-context", h.UpdateBusinessContext)
 
 		clausers.GET("/:id/screen", h.GetScreen)
 		clausers.POST("/:id/run-lenses", h.RunLenses)

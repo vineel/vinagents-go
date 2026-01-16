@@ -362,6 +362,126 @@ func TestUpdateTitle_Success(t *testing.T) {
 	assert.Equal(t, "Updated Title", data["title"])
 }
 
+func TestUpdateRepresentedParty_Success(t *testing.T) {
+	env := testutil.SetupTestEnv(t)
+	env.ResetDatabase(t)
+
+	authResp, err := env.CreateTestUser(t, "updateRP@example.com", "password123")
+	require.NoError(t, err)
+
+	clauserID := createTestClauser(t, env, authResp.AccessToken, "Test")
+
+	body := map[string]string{
+		"value": "Acme Corporation (Licensor)",
+	}
+
+	w := env.Request("PUT", "/api/v1/clausers/"+clauserID+"/represented-party", body, authResp.AccessToken)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp map[string]interface{}
+	testutil.ParseResponse(t, w, &resp)
+
+	data := resp["data"].(map[string]interface{})
+	assert.Equal(t, "Acme Corporation (Licensor)", data["representedParty"])
+}
+
+func TestUpdateDraftingApproach_Success(t *testing.T) {
+	env := testutil.SetupTestEnv(t)
+	env.ResetDatabase(t)
+
+	authResp, err := env.CreateTestUser(t, "updateDA@example.com", "password123")
+	require.NoError(t, err)
+
+	clauserID := createTestClauser(t, env, authResp.AccessToken, "Test")
+
+	body := map[string]string{
+		"value": "Aggressive - maximize protection for client",
+	}
+
+	w := env.Request("PUT", "/api/v1/clausers/"+clauserID+"/drafting-approach", body, authResp.AccessToken)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp map[string]interface{}
+	testutil.ParseResponse(t, w, &resp)
+
+	data := resp["data"].(map[string]interface{})
+	assert.Equal(t, "Aggressive - maximize protection for client", data["draftingApproach"])
+}
+
+func TestUpdatePlaybook_Success(t *testing.T) {
+	env := testutil.SetupTestEnv(t)
+	env.ResetDatabase(t)
+
+	authResp, err := env.CreateTestUser(t, "updatePB@example.com", "password123")
+	require.NoError(t, err)
+
+	clauserID := createTestClauser(t, env, authResp.AccessToken, "Test")
+
+	body := map[string]string{
+		"value": "Standard SaaS vendor playbook v2.1",
+	}
+
+	w := env.Request("PUT", "/api/v1/clausers/"+clauserID+"/playbook", body, authResp.AccessToken)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp map[string]interface{}
+	testutil.ParseResponse(t, w, &resp)
+
+	data := resp["data"].(map[string]interface{})
+	assert.Equal(t, "Standard SaaS vendor playbook v2.1", data["playbook"])
+}
+
+func TestUpdateCounterpartyRationale_Success(t *testing.T) {
+	env := testutil.SetupTestEnv(t)
+	env.ResetDatabase(t)
+
+	authResp, err := env.CreateTestUser(t, "updateCR@example.com", "password123")
+	require.NoError(t, err)
+
+	clauserID := createTestClauser(t, env, authResp.AccessToken, "Test")
+
+	body := map[string]string{
+		"value": "Counterparty is a Fortune 500 company with strong bargaining power",
+	}
+
+	w := env.Request("PUT", "/api/v1/clausers/"+clauserID+"/counterparty-rationale", body, authResp.AccessToken)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp map[string]interface{}
+	testutil.ParseResponse(t, w, &resp)
+
+	data := resp["data"].(map[string]interface{})
+	assert.Equal(t, "Counterparty is a Fortune 500 company with strong bargaining power", data["counterpartyRationale"])
+}
+
+func TestUpdateBusinessContext_Success(t *testing.T) {
+	env := testutil.SetupTestEnv(t)
+	env.ResetDatabase(t)
+
+	authResp, err := env.CreateTestUser(t, "updateBC@example.com", "password123")
+	require.NoError(t, err)
+
+	clauserID := createTestClauser(t, env, authResp.AccessToken, "Test")
+
+	body := map[string]string{
+		"value": "Strategic partnership deal worth $5M ARR, high priority",
+	}
+
+	w := env.Request("PUT", "/api/v1/clausers/"+clauserID+"/business-context", body, authResp.AccessToken)
+
+	assert.Equal(t, http.StatusOK, w.Code)
+
+	var resp map[string]interface{}
+	testutil.ParseResponse(t, w, &resp)
+
+	data := resp["data"].(map[string]interface{})
+	assert.Equal(t, "Strategic partnership deal worth $5M ARR, high priority", data["businessContext"])
+}
+
 func TestUpdateField_NotFound(t *testing.T) {
 	env := testutil.SetupTestEnv(t)
 	env.ResetDatabase(t)
@@ -401,9 +521,14 @@ func TestGetScreen_Success(t *testing.T) {
 
 	clauserID := createTestClauser(t, env, authResp.AccessToken, "Screen Test")
 
-	// Update some fields
+	// Update some fields including the new ones
 	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/clause-a", map[string]string{"value": "Clause A text"}, authResp.AccessToken)
 	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/clause-b", map[string]string{"value": "Clause B text"}, authResp.AccessToken)
+	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/represented-party", map[string]string{"value": "Test Corp"}, authResp.AccessToken)
+	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/drafting-approach", map[string]string{"value": "Balanced"}, authResp.AccessToken)
+	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/playbook", map[string]string{"value": "Standard playbook"}, authResp.AccessToken)
+	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/counterparty-rationale", map[string]string{"value": "Strong counterparty"}, authResp.AccessToken)
+	env.Request("PUT", "/api/v1/clausers/"+clauserID+"/business-context", map[string]string{"value": "Important deal"}, authResp.AccessToken)
 
 	w := env.Request("GET", "/api/v1/clausers/"+clauserID+"/screen", nil, authResp.AccessToken)
 
@@ -420,6 +545,11 @@ func TestGetScreen_Success(t *testing.T) {
 	assert.Equal(t, "Screen Test", clauser["title"])
 	assert.Equal(t, "Clause A text", clauser["clauseA"])
 	assert.Equal(t, "Clause B text", clauser["clauseB"])
+	assert.Equal(t, "Test Corp", clauser["representedParty"])
+	assert.Equal(t, "Balanced", clauser["draftingApproach"])
+	assert.Equal(t, "Standard playbook", clauser["playbook"])
+	assert.Equal(t, "Strong counterparty", clauser["counterpartyRationale"])
+	assert.Equal(t, "Important deal", clauser["businessContext"])
 
 	// Check outputs is empty initially
 	outputs := data["outputs"].([]interface{})

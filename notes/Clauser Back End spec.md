@@ -24,6 +24,11 @@ table: Clausers
     agreement_b: text
     clause_a: text
     clause_b: text
+    represented_party: text          // Who the user represents (e.g., "Acme Corp (Licensor)")
+    drafting_approach: text          // Strategy (e.g., "Aggressive", "Balanced", "Defensive")
+    playbook: text                   // Reference playbook or guidelines being used
+    counterparty_rationale: text     // Context about the counterparty's position
+    business_context: text           // Business context for the negotiation
     agent_run_id: UUID
     created_at: timestamp with timezone
     updated_at: timestamp with timezone
@@ -46,6 +51,11 @@ table: Clauser_outputs
     * update agreement_b
     * update clause_a
     * update clause_b
+    * update represented_party
+    * update drafting_approach
+    * update playbook
+    * update counterparty_rationale
+    * update business_context
 * An API to run lenses: input is an array of lense names to run. This will create an AgentRun row with appropriate data, and enqueue the job, etc. The agentrun.input_payload will be a JSONB with clause_a, clause_b, agreement_a, agreement_b, all outputs in the "input bag"
 * one API call to get all the data needed to draw the basic screen:
     1. all clauses and agreements

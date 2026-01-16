@@ -16,17 +16,22 @@ import (
 
 // ClauserResponse represents a clauser in API responses
 type ClauserResponse struct {
-	ClauserID      string          `json:"clauserId"`
-	UserID         string          `json:"userId"`
-	Title          *string         `json:"title"`
-	AgreementA     *string         `json:"agreementA"`
-	AgreementB     *string         `json:"agreementB"`
-	ClauseA        *string         `json:"clauseA"`
-	ClauseB        *string         `json:"clauseB"`
-	AgentRunID     *string         `json:"agentRunId,omitempty"`
-	ClauseCHistory json.RawMessage `json:"clauseCHistory"`
-	CreatedAt      time.Time       `json:"createdAt"`
-	UpdatedAt      time.Time       `json:"updatedAt"`
+	ClauserID             string          `json:"clauserId"`
+	UserID                string          `json:"userId"`
+	Title                 *string         `json:"title"`
+	AgreementA            *string         `json:"agreementA"`
+	AgreementB            *string         `json:"agreementB"`
+	ClauseA               *string         `json:"clauseA"`
+	ClauseB               *string         `json:"clauseB"`
+	RepresentedParty      *string         `json:"representedParty"`
+	DraftingApproach      *string         `json:"draftingApproach"`
+	Playbook              *string         `json:"playbook"`
+	CounterpartyRationale *string         `json:"counterpartyRationale"`
+	BusinessContext       *string         `json:"businessContext"`
+	AgentRunID            *string         `json:"agentRunId,omitempty"`
+	ClauseCHistory        json.RawMessage `json:"clauseCHistory"`
+	CreatedAt             time.Time       `json:"createdAt"`
+	UpdatedAt             time.Time       `json:"updatedAt"`
 }
 
 // ClauserOutputResponse represents a clauser output in API responses
@@ -468,17 +473,22 @@ func (s *ClauserService) GetOutputs(ctx context.Context, clauserID, userID strin
 
 func toClauserResponse(c *repository.Clauser) *ClauserResponse {
 	return &ClauserResponse{
-		ClauserID:      c.ClauserID,
-		UserID:         c.UserID,
-		Title:          c.Title,
-		AgreementA:     c.AgreementA,
-		AgreementB:     c.AgreementB,
-		ClauseA:        c.ClauseA,
-		ClauseB:        c.ClauseB,
-		AgentRunID:     c.AgentRunID,
-		ClauseCHistory: c.ClauseCHistory,
-		CreatedAt:      c.CreatedAt,
-		UpdatedAt:      c.UpdatedAt,
+		ClauserID:             c.ClauserID,
+		UserID:                c.UserID,
+		Title:                 c.Title,
+		AgreementA:            c.AgreementA,
+		AgreementB:            c.AgreementB,
+		ClauseA:               c.ClauseA,
+		ClauseB:               c.ClauseB,
+		RepresentedParty:      c.RepresentedParty,
+		DraftingApproach:      c.DraftingApproach,
+		Playbook:              c.Playbook,
+		CounterpartyRationale: c.CounterpartyRationale,
+		BusinessContext:       c.BusinessContext,
+		AgentRunID:            c.AgentRunID,
+		ClauseCHistory:        c.ClauseCHistory,
+		CreatedAt:             c.CreatedAt,
+		UpdatedAt:             c.UpdatedAt,
 	}
 }
 

@@ -269,6 +269,151 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
 
+  /clausers/{clauserId}/represented-party:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Represented Party
+      description: Update who the user represents in this negotiation
+      operationId: updateRepresentedParty
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/drafting-approach:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Drafting Approach
+      description: Update the drafting strategy (e.g., Aggressive, Balanced, Defensive)
+      operationId: updateDraftingApproach
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/playbook:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Playbook
+      description: Update the reference playbook or guidelines being used
+      operationId: updatePlaybook
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/counterparty-rationale:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Counterparty Rationale
+      description: Update context about the counterparty's position and motivations
+      operationId: updateCounterpartyRationale
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
+  /clausers/{clauserId}/business-context:
+    put:
+      tags:
+        - Clauser Fields
+      summary: Update Business Context
+      description: Update the business context for the negotiation
+      operationId: updateBusinessContext
+      parameters:
+        - $ref: '#/components/parameters/clauserId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateFieldRequest'
+      responses:
+        '200':
+          description: Clauser updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClauserResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+
   /clausers/{clauserId}/screen:
     get:
       tags:
@@ -571,6 +716,26 @@ components:
           type: string
           nullable: true
           description: Clause B (counterparty version)
+        representedParty:
+          type: string
+          nullable: true
+          description: Who the user represents (e.g., "Acme Corp (Licensor)")
+        draftingApproach:
+          type: string
+          nullable: true
+          description: Drafting strategy (e.g., "Aggressive", "Balanced", "Defensive")
+        playbook:
+          type: string
+          nullable: true
+          description: Reference playbook or guidelines being used
+        counterpartyRationale:
+          type: string
+          nullable: true
+          description: Context about the counterparty's position and motivations
+        businessContext:
+          type: string
+          nullable: true
+          description: Business context for the negotiation
         agentRunId:
           type: string
           format: uuid

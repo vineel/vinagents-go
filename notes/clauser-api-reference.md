@@ -111,6 +111,66 @@ PUT /clausers/{clauserId}/clause-b
 
 ---
 
+### Update Represented Party
+
+```
+PUT /clausers/{clauserId}/represented-party
+
+{
+  "value": "Acme Corporation (Licensor)"
+}
+```
+
+---
+
+### Update Drafting Approach
+
+```
+PUT /clausers/{clauserId}/drafting-approach
+
+{
+  "value": "Aggressive - maximize protection for client"
+}
+```
+
+---
+
+### Update Playbook
+
+```
+PUT /clausers/{clauserId}/playbook
+
+{
+  "value": "Standard SaaS vendor playbook v2.1"
+}
+```
+
+---
+
+### Update Counterparty Rationale
+
+```
+PUT /clausers/{clauserId}/counterparty-rationale
+
+{
+  "value": "Counterparty is a Fortune 500 company with strong bargaining power and standard procurement requirements"
+}
+```
+
+---
+
+### Update Business Context
+
+```
+PUT /clausers/{clauserId}/business-context
+
+{
+  "value": "Strategic partnership deal worth $5M ARR, high priority for Q1 close"
+}
+```
+
+---
+
 ## Screen State
 
 ### Get full screen state
@@ -231,6 +291,11 @@ DELETE /clausers/{clauserId}/favorites/{index}
   "agreementB": "Counterparty agreement text...",
   "clauseA": "Our clause version...",
   "clauseB": "Their clause version...",
+  "representedParty": "Acme Corporation (Licensor)",
+  "draftingApproach": "Balanced",
+  "playbook": "Standard SaaS vendor playbook v2.1",
+  "counterpartyRationale": "Fortune 500 company with standard procurement",
+  "businessContext": "Strategic partnership worth $5M ARR",
   "agentRunId": "uuid or null",
   "clauseCHistory": [
     {
