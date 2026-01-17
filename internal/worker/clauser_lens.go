@@ -138,91 +138,87 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 
 	w.logMessage(ctx, args.AgentRunID, "info", "Calling Claude API for lens analysis", nil)
 
-	// Enable dumbass mode for better results
-	dumbass := true
-
-	if dumbass {
-		// Call Claude
-		response, err := w.anthropicClient.Messages.New(ctx, anthropic.MessageNewParams{
-			Model:     anthropic.ModelClaudeSonnet4_20250514,
-			MaxTokens: 8192,
-			Messages: []anthropic.MessageParam{
-				anthropic.NewUserMessage(anthropic.NewTextBlock(promptText)),
-			},
-		})
-		if err != nil {
-			return fmt.Errorf("Claude API call failed: %w", err)
-		}
-
-		// Extract response text
-		var responseText string
-		for _, block := range response.Content {
-			if block.Type == "text" {
-				responseText = block.Text
-				break
-			}
-		}
-
-		// Dump raw response to file for debugging
-		responseFilename := fmt.Sprintf("lens_%s_2_response.txt", timestamp)
-		responsePath := filepath.Join("output", responseFilename)
-		if err := os.WriteFile(responsePath, []byte(responseText), 0644); err != nil {
-			slog.Warn("failed to dump response to file", "error", err, "path", responsePath)
-		} else {
-			slog.Info("dumped Claude response", "path", responsePath)
-		}
-
-		// Log token usage
-		details, _ := json.Marshal(map[string]interface{}{
-			"inputTokens":  response.Usage.InputTokens,
-			"outputTokens": response.Usage.OutputTokens,
-			"model":        response.Model,
-		})
-		w.logMessage(ctx, args.AgentRunID, "info", "Claude API call completed", details)
-
-		// Parse the JSON response
-		lensResults, err := w.parseLensResponse(responseText)
-		if err != nil {
-			return fmt.Errorf("failed to parse lens response: %w", err)
-		}
-
-		// Create output rows for each lens
-		ordinal, err := w.outputRepo.GetNextOrdinal(ctx, args.ClauserID)
-		if err != nil {
-			return fmt.Errorf("failed to get next ordinal: %w", err)
-		}
-
-		for i, lensName := range args.Lenses {
-			lensResult, ok := lensResults[lensName]
-			if !ok {
-				w.logMessage(ctx, args.AgentRunID, "warn", fmt.Sprintf("No results for lens: %s", lensName), nil)
-				continue
-			}
-
-			content, _ := json.Marshal(lensResult)
-
-			title := lensResult.Title
-			if title == "" {
-				title = lensName
-			}
-
-			_, err = w.outputRepo.Create(ctx, repository.CreateClauserOutputInput{
-				ClauserID:    args.ClauserID,
-				AgentRunID:   &args.AgentRunID,
-				Ordinal:      ordinal + i,
-				GroupName:    lensName,
-				GroupOrdinal: 0,
-				Title:        title,
-				Kind:         "lens_output",
-				Content:      content,
-			})
-			if err != nil {
-				return fmt.Errorf("failed to create output for lens %s: %w", lensName, err)
-			}
-		}
-
-		w.logMessage(ctx, args.AgentRunID, "info", fmt.Sprintf("Created %d lens outputs", len(lensResults)), nil)
+	// Call Claude
+	response, err := w.anthropicClient.Messages.New(ctx, anthropic.MessageNewParams{
+		Model:     anthropic.ModelClaudeSonnet4_20250514,
+		MaxTokens: 8192,
+		Messages: []anthropic.MessageParam{
+			anthropic.NewUserMessage(anthropic.NewTextBlock(promptText)),
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("Claude API call failed: %w", err)
 	}
+
+	// Extract response text
+	var responseText string
+	for _, block := range response.Content {
+		if block.Type == "text" {
+			responseText = block.Text
+			break
+		}
+	}
+
+	// Dump raw response to file for debugging
+	responseFilename := fmt.Sprintf("lens_%s_2_response.txt", timestamp)
+	responsePath := filepath.Join("output", responseFilename)
+	if err := os.WriteFile(responsePath, []byte(responseText), 0644); err != nil {
+		slog.Warn("failed to dump response to file", "error", err, "path", responsePath)
+	} else {
+		slog.Info("dumped Claude response", "path", responsePath)
+	}
+
+	// Log token usage
+	details, _ := json.Marshal(map[string]interface{}{
+		"inputTokens":  response.Usage.InputTokens,
+		"outputTokens": response.Usage.OutputTokens,
+		"model":        response.Model,
+	})
+	w.logMessage(ctx, args.AgentRunID, "info", "Claude API call completed", details)
+
+	// Parse the JSON response
+	lensResults, err := w.parseLensResponse(responseText)
+	if err != nil {
+		return fmt.Errorf("failed to parse lens response: %w", err)
+	}
+
+	// Create output rows for each lens
+	ordinal, err := w.outputRepo.GetNextOrdinal(ctx, args.ClauserID)
+	if err != nil {
+		return fmt.Errorf("failed to get next ordinal: %w", err)
+	}
+
+	for i, lensName := range args.Lenses {
+		lensResult, ok := lensResults[lensName]
+		if !ok {
+			w.logMessage(ctx, args.AgentRunID, "warn", fmt.Sprintf("No results for lens: %s", lensName), nil)
+			continue
+		}
+
+		content, _ := json.Marshal(lensResult)
+
+		title := lensResult.Title
+		if title == "" {
+			title = lensName
+		}
+
+		_, err = w.outputRepo.Create(ctx, repository.CreateClauserOutputInput{
+			ClauserID:    args.ClauserID,
+			AgentRunID:   &args.AgentRunID,
+			Ordinal:      ordinal + i,
+			GroupName:    lensName,
+			GroupOrdinal: 0,
+			Title:        title,
+			Kind:         "lens_output",
+			Content:      content,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to create output for lens %s: %w", lensName, err)
+		}
+	}
+
+	w.logMessage(ctx, args.AgentRunID, "info", fmt.Sprintf("Created %d lens outputs", len(lensResults)), nil)
+
 	return nil
 }
 

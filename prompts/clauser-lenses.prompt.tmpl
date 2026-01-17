@@ -78,18 +78,20 @@ Although you are seeking to find interest alignment, you always do so as if you 
   - Use tradeoffs only as a fallback when interests cannot be satisfied through clause-only edits AND only if doing so does not violate playbookRequirements
 
 
+{{if contains .Lenses "differenceSummary"}}
 ## Difference Summary
 Generate a "Difference Summary" from clause_a to clause_b. Each line item in the difference summary could be expressed as "Changed X to Y because Z", and output like the following, For Example:
 {
-  "difference_summary": [
+  "differenceSummary": [
     verb: "Changed", 
     source: "X",
     "dest": "Y",
     "reason_for_change":"Z"
   ]
 }
+{{end}}
 
-
+{{if contains .Lenses "deltaResolutionMap"}}
 ## Delta Resolution Map
 Generate a "Delta Map" that maps each point from Clause A, to Clause B, and finally to Clause C. Determine who interests were addressed -- "your" (represented_party), "counterparty", or "both".
 
@@ -105,7 +107,9 @@ For example:
     }
   ]
 }
+{{end}}
 
+{{if contains .Lenses "frictionForecast"}}
 ## Friction Forecast
 Generate a "Friction Forecast". This predicts the objections which clause_c may provoke in the counterparty. The response is a reasoned, mature suggestion for you to guide the represented_party to overcoming the objection. The concession lever is a concession that the represented_party might give the counterparty, that does not compromise any of represented_party's high priorities. The score is your prediction from 1-10 how likely and how strong the counterparty may object to anything in the clause.
 
@@ -122,7 +126,9 @@ For example:
     ]
   }
 }
+{{end}}
 
+{{if contains .Lenses "implementationNotes"}}
 ## Implementation Notes
 Generate an array of notes to tell the represented_party how they will have to operate to be in compliance with clause_c.
 
@@ -143,13 +149,15 @@ For example:
     }
   ]
 }
+{{end}}
 
+{{if contains .Lenses "internalNegotationNotes"}}
 ## Internal Negotiation Notes
 Generate a list of helpful guidance to be read only by the represented_party's Negotiator. It should have priority stack, fallbacks, trade logic, and risk flags.
 For example:
 
 {
-  "internal_negotation_notes": [
+  "internalNegotationNotes": [
     {
       "priority": "high, medium, or low"
       "text": "A piece of guidance",
@@ -165,16 +173,20 @@ For example:
     }
   ]
 }
+{{end}}
 
+{{if contains .Lenses "externalNegotationNotes"}}
 ## External Negotiation Notes
 Generate a list of diplomatic, sendable explanations to counterparty about why clause_c is fair and workable. These notes are safe to share with counterparty, without giving away internal strategies or tactics.
 {
-  "external_negotation_notes": [
+  "externalNegotationNotes": [
     priority: "high, medium, or low",
     text: "the text of the explanation line-item"
   ]
 }
+{{end}}
 
+{{if contains .Lenses "openIssues"}}
 ## Open Issues
 Generate a list of missing facts that materially affect clause_c. If there are none, leave the array empty.
 
@@ -186,7 +198,10 @@ Generate a list of missing facts that materially affect clause_c. If there are n
     }
   ]
 }
+{{end}}
 
+
+{{if contains .Lenses "dependentEdits"}}
 ## Dependent Edits
 Generate a list of any strictly required follow-on edits to definitions or cross-references needed to keep the document internally consistent with clause_c. Do not suggest optional or strategic edits. If no such edits are required, leave the array empty.
 
@@ -199,6 +214,7 @@ Generate a list of any strictly required follow-on edits to definitions or cross
       }
   ]
 }
+{{end}}
 
 ## Output Format (JSON Shape)
 
@@ -208,13 +224,13 @@ The output must follow these rules EXACTLY
 * must have exactly these keys, and only these keys, in this exact order:
 
 {
-  "difference_summary": [
+{{if contains .Lenses "differenceSummary"}}"differenceSummary": [
     verb: "", 
     source: "",
     "dest": "",
     "reason_for_change":""
-  ],
-  "deltaResolutionMap": [
+  ],{{end}}
+{{if contains .Lenses "deltaResolutionMap"}}"deltaResolutionMap": [
     {
       "clause_a": "",
       "clause_b": "",
@@ -222,8 +238,8 @@ The output must follow these rules EXACTLY
       "interestsProtected": "",
       "favorabilityPercent": ""
     }
-  ],
-  "frictionForecast": {
+  ],{{end}}
+{{if contains .Lenses "frictionForecast"}}"frictionForecast": {
     "score": 5,
     "objections": [
       {
@@ -232,14 +248,14 @@ The output must follow these rules EXACTLY
         "concessionLever": ""
       }
     ]
-  },
-  "implementationNotes": [
+  },{{end}}
+{{if contains .Lenses "implementationNotes"}}"implementationNotes": [
     {
       priority: "",
       note: ""
     }
-  ],
-  "internal_negotation_notes": [
+  ],{{end}}
+{{if contains .Lenses "internalNegotationNotes"}}"internalNegotationNotes": [
     {
       "priority":"",
       "text": "",
@@ -253,29 +269,32 @@ The output must follow these rules EXACTLY
         ""
       ]
     }
-  ],
-  "external_negotation_notes": [
+  ],{{end}}
+{{if contains .Lenses "externalNegotationNotes"}}"externalNegotationNotes": [
     priority: "",
     text: ""
-  ],
-  "openIssues": [
+  ],{{end}}
+{{if contains .Lenses "openIssues"}}"openIssues": [
     {
       priority: "",
       text: ""
     }
-  ],
-  "dependentEdits": [
+  ],{{end}}
+{{if contains .Lenses "dependentEdits"}}"dependentEdits": [
       {
         "priority": "",
         "text": "",
         "location": ""
       }
-  ]
-  
+  ],{{end}}
+  "terminator": "end"
 }
 
 Important:
-- diffSummary: max 10 bullets
+- differenceSummary: max 10 bullets
+- deltaResolutionMap: max 10 deltas
+- frictionForecast.objections: 3-5 objections the counterparty is likely to raise against the aligned clause, with response scripts the represented party can use.
+- implementationNotes: 3–6 bullets describing what the represented party must operationally do to comply with the aligned clause (processes, notices, approvals, recordkeeping, technical controls).
 - Assume Clause A is the represented party’s clause and Clause B is the counterparty’s clause. Do not swap roles based on wording.
 - No enforceability opinions or litigation predictions
 - Focus on drafting quality, risk allocation mechanics, and operational implementability
