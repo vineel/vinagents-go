@@ -5,9 +5,25 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"text/template"
 )
+
+// contains checks if a string slice contains a given item (case-insensitive)
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if strings.EqualFold(s, item) {
+			return true
+		}
+	}
+	return false
+}
+
+// templateFuncs are custom functions available in prompt templates
+var templateFuncs = template.FuncMap{
+	"contains": contains,
+}
 
 // Loader handles loading and executing prompt templates
 type Loader struct {
@@ -41,7 +57,7 @@ func (l *Loader) Load(name string) (*template.Template, error) {
 		return nil, fmt.Errorf("failed to read prompt template %s: %w", name, err)
 	}
 
-	tmpl, err := template.New(name).Parse(string(content))
+	tmpl, err := template.New(name).Funcs(templateFuncs).Parse(string(content))
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse prompt template %s: %w", name, err)
 	}
