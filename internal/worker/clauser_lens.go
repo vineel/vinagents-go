@@ -189,42 +189,40 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 		return fmt.Errorf("failed to parse lens response: %w", err)
 	}
 
-	// Create output rows for each lens
+	// Create single output row with all lens results
 	ordinal, err := w.outputRepo.GetNextOrdinal(ctx, args.ClauserID)
 	if err != nil {
 		return fmt.Errorf("failed to get next ordinal: %w", err)
 	}
 
-	for i, lensName := range args.Lenses {
+	// Combine all lens results into one object
+	combinedOutput := make(map[string]json.RawMessage)
+	for _, lensName := range args.Lenses {
 		lensResult, ok := lensResults[lensName]
 		if !ok {
 			w.logMessage(ctx, args.AgentRunID, "warn", fmt.Sprintf("No results for lens: %s", lensName), nil)
 			continue
 		}
-
-		content, _ := json.Marshal(lensResult)
-
-		title := lensResult.Title
-		if title == "" {
-			title = lensName
-		}
-
-		_, err = w.outputRepo.Create(ctx, repository.CreateClauserOutputInput{
-			ClauserID:    args.ClauserID,
-			AgentRunID:   &args.AgentRunID,
-			Ordinal:      ordinal + i,
-			GroupName:    lensName,
-			GroupOrdinal: 0,
-			Title:        title,
-			Kind:         "lens_output",
-			Content:      content,
-		})
-		if err != nil {
-			return fmt.Errorf("failed to create output for lens %s: %w", lensName, err)
-		}
+		combinedOutput[lensName] = lensResult.Items
 	}
 
-	w.logMessage(ctx, args.AgentRunID, "info", fmt.Sprintf("Created %d lens outputs", len(lensResults)), nil)
+	content, _ := json.Marshal(combinedOutput)
+
+	_, err = w.outputRepo.Create(ctx, repository.CreateClauserOutputInput{
+		ClauserID:    args.ClauserID,
+		AgentRunID:   &args.AgentRunID,
+		Ordinal:      ordinal,
+		GroupName:    "lenses",
+		GroupOrdinal: 0,
+		Title:        "Lens Analysis",
+		Kind:         "lens_output",
+		Content:      content,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to create lens output: %w", err)
+	}
+
+	w.logMessage(ctx, args.AgentRunID, "info", fmt.Sprintf("Created lens output with %d lenses", len(combinedOutput)), nil)
 
 	return nil
 }
