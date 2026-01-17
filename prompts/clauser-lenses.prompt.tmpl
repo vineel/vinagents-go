@@ -224,70 +224,72 @@ The output must follow these rules EXACTLY
 * must have exactly these keys, and only these keys, in this exact order:
 
 {
-{{if contains .Lenses "differenceSummary"}}"differenceSummary": [
-    verb: "", 
-    source: "",
-    "dest": "",
-    "reason_for_change":""
-  ],{{end}}
-{{if contains .Lenses "deltaResolutionMap"}}"deltaResolutionMap": [
-    {
-      "clause_a": "",
-      "clause_b": "",
-      "clause_c": "",
-      "interestsProtected": "",
-      "favorabilityPercent": ""
-    }
-  ],{{end}}
-{{if contains .Lenses "frictionForecast"}}"frictionForecast": {
-    "score": 5,
-    "objections": [
+  "lenses": {
+  {{if contains .Lenses "differenceSummary"}}"differenceSummary": [
+      verb: "", 
+      source: "",
+      "dest": "",
+      "reason_for_change":""
+    ],{{end}}
+  {{if contains .Lenses "deltaResolutionMap"}}"deltaResolutionMap": [
       {
-        "objection": "",
-        "response": "",
-        "concessionLever": ""
+        "clause_a": "",
+        "clause_b": "",
+        "clause_c": "",
+        "interestsProtected": "",
+        "favorabilityPercent": ""
       }
-    ]
-  },{{end}}
-{{if contains .Lenses "implementationNotes"}}"implementationNotes": [
-    {
-      priority: "",
-      note: ""
-    }
-  ],{{end}}
-{{if contains .Lenses "internalNegotationNotes"}}"internalNegotationNotes": [
-    {
-      "priority":"",
-      "text": "",
-      "notes": [
-        ""
-      ],
-      "fallbacks": [
-        ""
-      ],
-      "risks": [
-        ""
+    ],{{end}}
+  {{if contains .Lenses "frictionForecast"}}"frictionForecast": {
+      "score": 5,
+      "objections": [
+        {
+          "objection": "",
+          "response": "",
+          "concessionLever": ""
+        }
       ]
-    }
-  ],{{end}}
-{{if contains .Lenses "externalNegotationNotes"}}"externalNegotationNotes": [
-    priority: "",
-    text: ""
-  ],{{end}}
-{{if contains .Lenses "openIssues"}}"openIssues": [
-    {
+    },{{end}}
+  {{if contains .Lenses "implementationNotes"}}"implementationNotes": [
+      {
+        priority: "",
+        note: ""
+      }
+    ],{{end}}
+  {{if contains .Lenses "internalNegotationNotes"}}"internalNegotationNotes": [
+      {
+        "priority":"",
+        "text": "",
+        "notes": [
+          ""
+        ],
+        "fallbacks": [
+          ""
+        ],
+        "risks": [
+          ""
+        ]
+      }
+    ],{{end}}
+  {{if contains .Lenses "externalNegotationNotes"}}"externalNegotationNotes": [
       priority: "",
       text: ""
-    }
-  ],{{end}}
-{{if contains .Lenses "dependentEdits"}}"dependentEdits": [
+    ],{{end}}
+  {{if contains .Lenses "openIssues"}}"openIssues": [
       {
-        "priority": "",
-        "text": "",
-        "location": ""
+        priority: "",
+        text: ""
       }
-  ],{{end}}
-  "terminator": "end"
+    ],{{end}}
+  {{if contains .Lenses "dependentEdits"}}"dependentEdits": [
+        {
+          "priority": "",
+          "text": "",
+          "location": ""
+        }
+    ],{{end}}
+    "terminator": "end"
+  }
 }
 
 Important:

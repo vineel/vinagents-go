@@ -159,6 +159,13 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 		}
 	}
 
+	// Clean responseText by removing junk before first '{' and after last '}'
+	firstBrace := findIndex(responseText, "{")
+	lastBrace := findLastIndex(responseText, "}")
+	if firstBrace >= 0 && lastBrace > firstBrace {
+		responseText = responseText[firstBrace : lastBrace+1]
+	}
+
 	// Dump raw response to file for debugging
 	responseFilename := fmt.Sprintf("lens_%s_2_response.txt", timestamp)
 	responsePath := filepath.Join("output", responseFilename)
@@ -222,15 +229,10 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 	return nil
 }
 
+// lensResult holds the parsed output for a single lens
 type lensResult struct {
-	Title string     `json:"title"`
-	Items []lensItem `json:"items"`
-}
-
-type lensItem struct {
-	Title    string `json:"title"`
-	Body     string `json:"body"`
-	Severity string `json:"severity"`
+	Title string          `json:"title"`
+	Items json.RawMessage `json:"items"` // Store raw JSON - structure varies by lens type
 }
 
 func (w *ClauserLensWorker) parseLensResponse(responseText string) (map[string]lensResult, error) {
@@ -238,14 +240,28 @@ func (w *ClauserLensWorker) parseLensResponse(responseText string) (map[string]l
 	jsonText := extractJSON(responseText)
 
 	var parsed struct {
-		Lenses map[string]lensResult `json:"lenses"`
+		Lenses map[string]json.RawMessage `json:"lenses"`
 	}
 
 	if err := json.Unmarshal([]byte(jsonText), &parsed); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON: %w (response: %s)", err, truncate(jsonText, 500))
 	}
 
-	return parsed.Lenses, nil
+	results := make(map[string]lensResult)
+	for lensName, rawData := range parsed.Lenses {
+		// Skip non-lens fields like "terminator"
+		if lensName == "terminator" {
+			continue
+		}
+
+		// The lens data is an array directly, wrap it as items
+		results[lensName] = lensResult{
+			Title: lensName,
+			Items: rawData,
+		}
+	}
+
+	return results, nil
 }
 
 func (w *ClauserLensWorker) loadFavorites(ctx context.Context, clauserID string) ([]prompt.FavoriteItem, error) {
