@@ -1,5 +1,11 @@
 package worker
 
+import (
+	"strings"
+
+	"github.com/google/uuid"
+)
+
 // Helper functions shared between clauser workers
 
 // ptr returns a pointer to the given value
@@ -69,4 +75,13 @@ func truncate(s string, maxLen int) string {
 		return s
 	}
 	return s[:maxLen] + "..."
+}
+
+// replaceUUIDPlaceholders replaces each occurrence of UUID_PLACEHOLDER with a unique UUID
+func replaceUUIDPlaceholders(text string) string {
+	const placeholder = "UUID_PLACEHOLDER"
+	for strings.Contains(text, placeholder) {
+		text = strings.Replace(text, placeholder, uuid.New().String(), 1)
+	}
+	return text
 }

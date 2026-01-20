@@ -171,6 +171,9 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 		responseText = responseText[firstBrace : lastBrace+1]
 	}
 
+	// Replace each UUID_PLACEHOLDER with a unique UUID
+	responseText = replaceUUIDPlaceholders(responseText)
+
 	// Dump raw response to file for debugging
 	responseFilename := fmt.Sprintf("lens_%s_2_response.txt", timestamp)
 	responsePath := filepath.Join("output", responseFilename)
