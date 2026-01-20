@@ -183,6 +183,26 @@ func (s *ClauserService) UpdateField(ctx context.Context, clauserID, userID, fie
 	return toClauserResponse(clauser), nil
 }
 
+// AppendClauseC appends a new clause C version to the history
+func (s *ClauserService) AppendClauseC(ctx context.Context, clauserID, userID, text string) (*ClauserResponse, error) {
+	// Verify ownership
+	_, err := s.clauserRepo.FindByIDAndUserID(ctx, clauserID, userID)
+	if err != nil {
+		return nil, middleware.NewNotFoundError("Clauser not found")
+	}
+
+	entry := map[string]interface{}{
+		"text":      text,
+		"createdAt": time.Now().Format(time.RFC3339),
+	}
+
+	clauser, err := s.clauserRepo.AppendClauseCHistory(ctx, clauserID, entry)
+	if err != nil {
+		return nil, middleware.NewInternalError("Failed to append clause C", err)
+	}
+	return toClauserResponse(clauser), nil
+}
+
 // GetScreenState returns the full screen state for a clauser
 func (s *ClauserService) GetScreenState(ctx context.Context, clauserID, userID string) (*ScreenStateResponse, error) {
 	// Get clauser

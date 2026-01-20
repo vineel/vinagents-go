@@ -40,6 +40,10 @@ type addFavoriteRequest struct {
 	ItemIndex int `json:"itemIndex" binding:"min=0"`
 }
 
+type appendClauseCRequest struct {
+	Text string `json:"text" binding:"required"`
+}
+
 // Handlers
 
 func (h *ClauserHandler) Create(c *gin.Context) {
@@ -311,6 +315,28 @@ func (h *ClauserHandler) GetOutputs(c *gin.Context) {
 	})
 }
 
+func (h *ClauserHandler) AppendClauseC(c *gin.Context) {
+	authUser := middleware.MustGetAuthUser(c)
+	clauserID := c.Param("id")
+
+	var req appendClauseCRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.Error(middleware.NewBadRequestError("Invalid request body: " + err.Error()))
+		return
+	}
+
+	result, err := h.clauserService.AppendClauseC(c.Request.Context(), clauserID, authUser.UserID, req.Text)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"data":   result,
+	})
+}
+
 // RegisterRoutes registers clauser routes (all protected)
 func (h *ClauserHandler) RegisterRoutes(rg *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	clausers := rg.Group("/clausers")
@@ -335,6 +361,7 @@ func (h *ClauserHandler) RegisterRoutes(rg *gin.RouterGroup, authMiddleware gin.
 		clausers.GET("/:id/screen", h.GetScreen)
 		clausers.POST("/:id/run-lenses", h.RunLenses)
 		clausers.POST("/:id/rewrite", h.Rewrite)
+		clausers.POST("/:id/clause-c", h.AppendClauseC)
 
 		clausers.GET("/:id/outputs", h.GetOutputs)
 		clausers.POST("/:id/outputs/:outputId/favorite", h.AddFavorite)
