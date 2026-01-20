@@ -541,10 +541,10 @@ The API searches the output's content for an item with the matching `itemId`, co
 ### Remove from Favorites
 
 ```
-DELETE /clausers/{clauserId}/favorites/{index}
+DELETE /clausers/{clauserId}/favorites/{itemId}
 ```
 
-- `index` - zero-based index in the favorites list
+- `itemId` - The UUID of the item to remove from favorites
 
 **Response (200):**
 ```json
@@ -553,6 +553,8 @@ DELETE /clausers/{clauserId}/favorites/{index}
   "data": { /* Updated favorites ClauserOutput */ }
 }
 ```
+
+**Response (404):** If `itemId` is not found in favorites.
 
 ---
 

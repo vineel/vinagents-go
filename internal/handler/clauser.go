@@ -279,15 +279,14 @@ func (h *ClauserHandler) AddFavorite(c *gin.Context) {
 func (h *ClauserHandler) RemoveFavorite(c *gin.Context) {
 	authUser := middleware.MustGetAuthUser(c)
 	clauserID := c.Param("id")
-	indexStr := c.Param("index")
+	itemID := c.Param("itemId")
 
-	index, err := strconv.Atoi(indexStr)
-	if err != nil || index < 0 {
-		c.Error(middleware.NewBadRequestError("Invalid favorite index"))
+	if itemID == "" {
+		c.Error(middleware.NewBadRequestError("Item ID is required"))
 		return
 	}
 
-	result, err := h.clauserService.RemoveFromFavorites(c.Request.Context(), clauserID, authUser.UserID, index)
+	result, err := h.clauserService.RemoveFromFavorites(c.Request.Context(), clauserID, authUser.UserID, itemID)
 	if err != nil {
 		c.Error(err)
 		return
@@ -383,6 +382,6 @@ func (h *ClauserHandler) RegisterRoutes(rg *gin.RouterGroup, authMiddleware gin.
 
 		clausers.GET("/:id/outputs", h.GetOutputs)
 		clausers.POST("/:id/outputs/:outputId/favorite", h.AddFavorite)
-		clausers.DELETE("/:id/favorites/:index", h.RemoveFavorite)
+		clausers.DELETE("/:id/favorites/:itemId", h.RemoveFavorite)
 	}
 }

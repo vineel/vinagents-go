@@ -228,6 +228,62 @@ func (r *ClauserOutputRepository) RemoveFavorite(ctx context.Context, clauserID 
 	return r.scanOutput(r.pool.QueryRow(ctx, query, newContent, favorites.ClauserOutputID))
 }
 
+// RemoveFavoriteByItemID removes an item from favorites by its itemId
+func (r *ClauserOutputRepository) RemoveFavoriteByItemID(ctx context.Context, clauserID, itemID string) (*ClauserOutput, error) {
+	favorites, err := r.FindFavorites(ctx, clauserID)
+	if err != nil {
+		return nil, err
+	}
+	if favorites == nil {
+		return nil, ErrClauserOutputNotFound
+	}
+
+	// Parse existing content
+	var content map[string]interface{}
+	if err := json.Unmarshal(favorites.Content, &content); err != nil {
+		return nil, err
+	}
+
+	items, ok := content["items"].([]interface{})
+	if !ok {
+		return nil, errors.New("invalid favorites content")
+	}
+
+	// Find and remove the item with matching itemId
+	found := false
+	newItems := make([]interface{}, 0, len(items))
+	for _, item := range items {
+		itemMap, ok := item.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if itemMap["itemId"] == itemID {
+			found = true
+			continue // Skip this item (remove it)
+		}
+		newItems = append(newItems, item)
+	}
+
+	if !found {
+		return nil, errors.New("favorite not found")
+	}
+
+	content["items"] = newItems
+
+	newContent, err := json.Marshal(content)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+		UPDATE app.clauser_outputs
+		SET content = $1
+		WHERE clauser_output_id = $2
+		RETURNING clauser_output_id, clauser_id, agent_run_id, ordinal, group_name, group_ordinal, title, kind, content, created_at
+	`
+	return r.scanOutput(r.pool.QueryRow(ctx, query, newContent, favorites.ClauserOutputID))
+}
+
 // GetNextOrdinal returns the next ordinal value for a clauser's outputs
 func (r *ClauserOutputRepository) GetNextOrdinal(ctx context.Context, clauserID string) (int, error) {
 	query := `SELECT COALESCE(MAX(ordinal), 0) + 1 FROM app.clauser_outputs WHERE clauser_id = $1`

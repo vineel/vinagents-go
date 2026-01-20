@@ -524,17 +524,17 @@ func findItemByID(content map[string]interface{}, targetItemID string) (map[stri
 	return nil, "", false
 }
 
-// RemoveFromFavorites removes an item from favorites
-func (s *ClauserService) RemoveFromFavorites(ctx context.Context, clauserID, userID string, index int) (*ClauserOutputResponse, error) {
+// RemoveFromFavorites removes an item from favorites by itemId
+func (s *ClauserService) RemoveFromFavorites(ctx context.Context, clauserID, userID, itemID string) (*ClauserOutputResponse, error) {
 	// Verify ownership
 	_, err := s.clauserRepo.FindByIDAndUserID(ctx, clauserID, userID)
 	if err != nil {
 		return nil, middleware.NewNotFoundError("Clauser not found")
 	}
 
-	favorites, err := s.outputRepo.RemoveFavorite(ctx, clauserID, index)
+	favorites, err := s.outputRepo.RemoveFavoriteByItemID(ctx, clauserID, itemID)
 	if err != nil {
-		return nil, middleware.NewInternalError("Failed to remove from favorites", err)
+		return nil, middleware.NewNotFoundError("Favorite not found")
 	}
 
 	resp := toClauserOutputResponse(favorites)

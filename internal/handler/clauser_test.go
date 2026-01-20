@@ -820,8 +820,8 @@ func TestRemoveFavorite_Success(t *testing.T) {
 	addBody := map[string]interface{}{"itemId": testItemID}
 	env.Request("POST", "/api/v1/clausers/"+clauserID+"/outputs/"+output.ClauserOutputID+"/favorite", addBody, authResp.AccessToken)
 
-	// Remove from favorites
-	w := env.Request("DELETE", "/api/v1/clausers/"+clauserID+"/favorites/0", nil, authResp.AccessToken)
+	// Remove from favorites by itemId
+	w := env.Request("DELETE", "/api/v1/clausers/"+clauserID+"/favorites/"+testItemID, nil, authResp.AccessToken)
 
 	assert.Equal(t, http.StatusOK, w.Code)
 
@@ -833,7 +833,7 @@ func TestRemoveFavorite_Success(t *testing.T) {
 	assert.Len(t, items, 0)
 }
 
-func TestRemoveFavorite_InvalidIndex(t *testing.T) {
+func TestRemoveFavorite_InvalidItemId(t *testing.T) {
 	env := testutil.SetupTestEnv(t)
 	env.ResetDatabase(t)
 
@@ -842,8 +842,8 @@ func TestRemoveFavorite_InvalidIndex(t *testing.T) {
 
 	clauserID := createTestClauser(t, env, authResp.AccessToken, "Remove Fav Test")
 
-	// Try to remove with invalid index (no favorites exist)
-	w := env.Request("DELETE", "/api/v1/clausers/"+clauserID+"/favorites/0", nil, authResp.AccessToken)
+	// Try to remove with non-existent itemId
+	w := env.Request("DELETE", "/api/v1/clausers/"+clauserID+"/favorites/non-existent-item-id", nil, authResp.AccessToken)
 
-	assert.Equal(t, http.StatusInternalServerError, w.Code)
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
