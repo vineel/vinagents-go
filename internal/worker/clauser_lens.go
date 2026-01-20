@@ -197,6 +197,11 @@ func (w *ClauserLensWorker) execute(ctx context.Context, args ClauserLensArgs) e
 		return fmt.Errorf("failed to parse lens response: %w", err)
 	}
 
+	// Delete previous lens outputs for this clauser
+	if err := w.outputRepo.DeleteByClauserIDAndKind(ctx, args.ClauserID, "lens_output"); err != nil {
+		return fmt.Errorf("failed to delete previous lens outputs: %w", err)
+	}
+
 	// Create single output row with all lens results
 	ordinal, err := w.outputRepo.GetNextOrdinal(ctx, args.ClauserID)
 	if err != nil {

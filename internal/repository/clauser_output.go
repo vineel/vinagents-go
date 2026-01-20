@@ -312,6 +312,13 @@ func (r *ClauserOutputRepository) DeleteByClauserID(ctx context.Context, clauser
 	return err
 }
 
+// DeleteByClauserIDAndKind deletes outputs for a clauser with a specific kind
+func (r *ClauserOutputRepository) DeleteByClauserIDAndKind(ctx context.Context, clauserID, kind string) error {
+	query := `DELETE FROM app.clauser_outputs WHERE clauser_id = $1 AND kind = $2`
+	_, err := r.pool.Exec(ctx, query, clauserID, kind)
+	return err
+}
+
 func (r *ClauserOutputRepository) scanOutput(row pgx.Row) (*ClauserOutput, error) {
 	var o ClauserOutput
 	err := row.Scan(
