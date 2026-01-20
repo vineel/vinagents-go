@@ -22,8 +22,8 @@ func NewClauserRepository(pool *pgxpool.Pool) *ClauserRepository {
 
 func (r *ClauserRepository) Create(ctx context.Context, input CreateClauserInput) (*Clauser, error) {
 	query := `
-		INSERT INTO app.clausers (user_id, title)
-		VALUES ($1, $2)
+		INSERT INTO app.clausers (user_id, title, represented_party, drafting_approach)
+		VALUES ($1, $2, 'Customer', 'Draft from scratch - Optimize for alignment')
 		RETURNING clauser_id, user_id, title, agreement_a, agreement_b, clause_a, clause_b,
 		          represented_party, drafting_approach, playbook, counterparty_rationale, business_context,
 		          agent_run_id, clause_c_history, created_at, updated_at
