@@ -37,7 +37,7 @@ type rewriteRequest struct {
 }
 
 type addFavoriteRequest struct {
-	ItemIndex int `json:"itemIndex" binding:"min=0"`
+	ItemID string `json:"itemId" binding:"required"`
 }
 
 type appendClauseCRequest struct {
@@ -264,7 +264,7 @@ func (h *ClauserHandler) AddFavorite(c *gin.Context) {
 		return
 	}
 
-	result, err := h.clauserService.AddToFavorites(c.Request.Context(), clauserID, authUser.UserID, outputID, req.ItemIndex)
+	result, err := h.clauserService.AddToFavorites(c.Request.Context(), clauserID, authUser.UserID, outputID, req.ItemID)
 	if err != nil {
 		c.Error(err)
 		return

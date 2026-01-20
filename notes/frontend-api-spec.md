@@ -380,15 +380,20 @@ interface ClauserOutput {
 {
   "items": [
     {
-      "sourceOutputId": "uuid",
-      "sourceItemIndex": 0,
-      "sourceGroupName": "risks",
-      "title": "Item title",
-      "body": "Item body text"
+      "itemId": "uuid-of-the-original-item",
+      "sourceOutputId": "uuid-of-clauser-output-row",
+      "lens": "deltaResolutionMap",
+      "data": {
+        "priority": "high",
+        "clause_a": "...",
+        "clause_b": "...",
+        "clause_c": "..."
+      }
     }
   ]
 }
 ```
+Note: The `data` field contains the original item with `itemId` stripped out. The structure varies by lens type.
 
 ### Get All Outputs
 
@@ -483,6 +488,25 @@ POST /clausers/{clauserId}/clause-c
 }
 ```
 
+### Clear Run
+
+Cancels any active job and clears the `agentRunId` on the clauser. Useful when a job gets stuck or times out.
+
+```
+POST /clausers/{clauserId}/clear-run
+```
+
+**Request:** No body required
+
+**Response (200):**
+```json
+{
+  "status": "success",
+  "data": { /* Updated Clauser object with agentRunId: null */ },
+  "message": "Run cleared"
+}
+```
+
 ---
 
 ## Favorites
@@ -496,11 +520,13 @@ POST /clausers/{clauserId}/outputs/{outputId}/favorite
 **Request:**
 ```json
 {
-  "itemIndex": 0
+  "itemId": "uuid-of-item-to-favorite"
 }
 ```
 
-- `itemIndex` - zero-based index into the output's content items array
+- `itemId` - The UUID of the item within the lens output (each item has a unique `itemId` field)
+
+The API searches the output's content for an item with the matching `itemId`, copies it to favorites along with the lens name.
 
 **Response (200):**
 ```json
@@ -509,6 +535,8 @@ POST /clausers/{clauserId}/outputs/{outputId}/favorite
   "data": { /* Updated favorites ClauserOutput */ }
 }
 ```
+
+**Response (404):** If `itemId` is not found in the output content.
 
 ### Remove from Favorites
 

@@ -113,7 +113,9 @@ For example:
 
 {{if contains .Lenses "frictionForecast"}}
 ## Friction Forecast
-Generate a "Friction Forecast". This predicts the objections which clause_c may provoke in the counterparty. The response is a reasoned, mature suggestion for you to guide the represented_party to overcoming the objection. The concession lever is a concession that the represented_party might give the counterparty, that does not compromise any of represented_party's high priorities. The score is your prediction from 1-10 how likely and how strong the counterparty may object to anything in the clause.
+Generate a "Friction Forecast". This predicts the objections which clause_c may provoke in the counterparty. The response is a reasoned, mature suggestion for you to guide the represented_party to overcoming the objection. The concession lever is a concession that the represented_party might give the counterparty, that does not compromise any of represented_party's high priorities.
+
+The score is your prediction from 1-10 how likely and how strong the counterparty may object to anything in the clause.
 
 For example:
 {  
@@ -230,7 +232,7 @@ The output must follow these rules EXACTLY
 {
   "lenses": {
   {{if contains .Lenses "differenceSummary"}}"differenceSummary": [
-      "outputId": "new UUID",
+      "itemId": "new UUID",
       "priority": "",
       "verb": "", 
       "source": "",
@@ -239,7 +241,7 @@ The output must follow these rules EXACTLY
     ],{{end}}
   {{if contains .Lenses "deltaResolutionMap"}}"deltaResolutionMap": [
       {
-        "outputId": "new UUID",
+        "itemId": "new UUID",
         "priority": "",
         "clause_a": "",
         "clause_b": "",
@@ -248,28 +250,28 @@ The output must follow these rules EXACTLY
         "favorabilityPercent": ""
       }
     ],{{end}}
-  {{if contains .Lenses "frictionForecast"}}"frictionForecast": {
-      "outputId": "new UUID",
-      "priority": "",
+  {{if contains .Lenses "frictionForecast"}}"frictionForecast": [
       "score": 5,
       "objections": [
         {
+          "itemId": "new UUID",
+          "priority": "",
           "objection": "",
           "response": "",
           "concessionLever": ""
         }
       ]
-    },{{end}}
+    ],{{end}}
   {{if contains .Lenses "implementationNotes"}}"implementationNotes": [
       {
-        "outputId": "new UUID",
+        "itemId": "new UUID",
         "priority": "",
         "note": ""
       }
     ],{{end}}
   {{if contains .Lenses "internalNegotationNotes"}}"internalNegotationNotes": [
       {
-        "outputId": "new UUID",
+        "itemId": "new UUID",
         "priority":"",
         "text": "",
         "notes": [
@@ -284,20 +286,20 @@ The output must follow these rules EXACTLY
       }
     ],{{end}}
   {{if contains .Lenses "externalNegotationNotes"}}"externalNegotationNotes": [
-      "outputId": "new UUID",
+      "itemId": "new UUID",
       "priority": "",
       "text": ""
     ],{{end}}
   {{if contains .Lenses "openIssues"}}"openIssues": [
       {
-        "outputId": "new UUID",
+        "itemId": "new UUID",
         "priority": "",
         text: ""
       }
     ],{{end}}
   {{if contains .Lenses "dependentEdits"}}"dependentEdits": [
         {
-          "outputId": "new UUID",
+          "itemId": "new UUID",
           "priority": "",
           "text": "",
           "location": ""

@@ -707,27 +707,28 @@ func TestAddFavorite_Success(t *testing.T) {
 
 	clauserID := createTestClauser(t, env, authResp.AccessToken, "Fav Test")
 
-	// Create an output directly in the database for testing
+	// Create an output with lens-based structure (as returned by Claude)
 	ctx := context.Background()
+	testItemID := "test-item-id-123"
 	content, _ := json.Marshal(map[string]interface{}{
-		"items": []map[string]interface{}{
-			{"title": "Risk 1", "body": "Risk description", "severity": "high"},
+		"risks": []map[string]interface{}{
+			{"itemId": testItemID, "priority": "high", "text": "Risk description"},
 		},
 	})
 
 	output, err := repository.NewClauserOutputRepository(env.Pool).Create(ctx, repository.CreateClauserOutputInput{
 		ClauserID:    clauserID,
 		Ordinal:      1,
-		GroupName:    "risks",
+		GroupName:    "lenses",
 		GroupOrdinal: 0,
-		Title:        "Risk Analysis",
+		Title:        "Lens Analysis",
 		Kind:         "lens_output",
 		Content:      content,
 	})
 	require.NoError(t, err)
 
 	body := map[string]interface{}{
-		"itemIndex": 0,
+		"itemId": testItemID,
 	}
 
 	w := env.Request("POST", "/api/v1/clausers/"+clauserID+"/outputs/"+output.ClauserOutputID+"/favorite", body, authResp.AccessToken)
@@ -742,10 +743,14 @@ func TestAddFavorite_Success(t *testing.T) {
 
 	items := data["content"].(map[string]interface{})["items"].([]interface{})
 	assert.Len(t, items, 1)
-	assert.Equal(t, "Risk 1", items[0].(map[string]interface{})["title"])
+
+	favItem := items[0].(map[string]interface{})
+	assert.Equal(t, testItemID, favItem["itemId"])
+	assert.Equal(t, "risks", favItem["lens"])
+	assert.Equal(t, output.ClauserOutputID, favItem["sourceOutputId"])
 }
 
-func TestAddFavorite_InvalidIndex(t *testing.T) {
+func TestAddFavorite_InvalidItemId(t *testing.T) {
 	env := testutil.SetupTestEnv(t)
 	env.ResetDatabase(t)
 
@@ -754,32 +759,32 @@ func TestAddFavorite_InvalidIndex(t *testing.T) {
 
 	clauserID := createTestClauser(t, env, authResp.AccessToken, "Fav Test")
 
-	// Create an output
+	// Create an output with lens-based structure
 	ctx := context.Background()
 	content, _ := json.Marshal(map[string]interface{}{
-		"items": []map[string]interface{}{
-			{"title": "Risk 1", "body": "Risk description", "severity": "high"},
+		"risks": []map[string]interface{}{
+			{"itemId": "real-item-id", "priority": "high", "text": "Risk description"},
 		},
 	})
 
 	output, err := repository.NewClauserOutputRepository(env.Pool).Create(ctx, repository.CreateClauserOutputInput{
 		ClauserID:    clauserID,
 		Ordinal:      1,
-		GroupName:    "risks",
+		GroupName:    "lenses",
 		GroupOrdinal: 0,
-		Title:        "Risk Analysis",
+		Title:        "Lens Analysis",
 		Kind:         "lens_output",
 		Content:      content,
 	})
 	require.NoError(t, err)
 
 	body := map[string]interface{}{
-		"itemIndex": 99, // Invalid index
+		"itemId": "non-existent-item-id", // Invalid itemId
 	}
 
 	w := env.Request("POST", "/api/v1/clausers/"+clauserID+"/outputs/"+output.ClauserOutputID+"/favorite", body, authResp.AccessToken)
 
-	assert.Equal(t, http.StatusBadRequest, w.Code)
+	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
 func TestRemoveFavorite_Success(t *testing.T) {
@@ -791,27 +796,28 @@ func TestRemoveFavorite_Success(t *testing.T) {
 
 	clauserID := createTestClauser(t, env, authResp.AccessToken, "Remove Fav Test")
 
-	// Create an output and add to favorites
+	// Create an output with lens-based structure
 	ctx := context.Background()
+	testItemID := "remove-test-item-id"
 	content, _ := json.Marshal(map[string]interface{}{
-		"items": []map[string]interface{}{
-			{"title": "Risk 1", "body": "Risk description", "severity": "high"},
+		"risks": []map[string]interface{}{
+			{"itemId": testItemID, "priority": "high", "text": "Risk description"},
 		},
 	})
 
 	output, err := repository.NewClauserOutputRepository(env.Pool).Create(ctx, repository.CreateClauserOutputInput{
 		ClauserID:    clauserID,
 		Ordinal:      1,
-		GroupName:    "risks",
+		GroupName:    "lenses",
 		GroupOrdinal: 0,
-		Title:        "Risk Analysis",
+		Title:        "Lens Analysis",
 		Kind:         "lens_output",
 		Content:      content,
 	})
 	require.NoError(t, err)
 
 	// Add to favorites first
-	addBody := map[string]interface{}{"itemIndex": 0}
+	addBody := map[string]interface{}{"itemId": testItemID}
 	env.Request("POST", "/api/v1/clausers/"+clauserID+"/outputs/"+output.ClauserOutputID+"/favorite", addBody, authResp.AccessToken)
 
 	// Remove from favorites

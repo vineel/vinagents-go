@@ -432,8 +432,8 @@ func (s *ClauserService) Rewrite(ctx context.Context, clauserID, userID string, 
 	}, nil
 }
 
-// AddToFavorites adds an item to favorites
-func (s *ClauserService) AddToFavorites(ctx context.Context, clauserID, userID, outputID string, itemIndex int) (*ClauserOutputResponse, error) {
+// AddToFavorites adds an item to favorites by searching for itemId in the output content
+func (s *ClauserService) AddToFavorites(ctx context.Context, clauserID, userID, outputID, itemID string) (*ClauserOutputResponse, error) {
 	// Verify ownership
 	_, err := s.clauserRepo.FindByIDAndUserID(ctx, clauserID, userID)
 	if err != nil {
@@ -451,29 +451,31 @@ func (s *ClauserService) AddToFavorites(ctx context.Context, clauserID, userID, 
 		return nil, middleware.NewNotFoundError("Output not found")
 	}
 
-	// Extract the item from the content
+	// Parse the output content and search for the item
 	var content map[string]interface{}
 	if err := json.Unmarshal(output.Content, &content); err != nil {
 		return nil, middleware.NewInternalError("Failed to parse output content", err)
 	}
 
-	items, ok := content["items"].([]interface{})
-	if !ok || itemIndex < 0 || itemIndex >= len(items) {
-		return nil, middleware.NewBadRequestError("Invalid item index")
+	// Search for item with matching itemId
+	item, lensName, found := findItemByID(content, itemID)
+	if !found {
+		return nil, middleware.NewNotFoundError("Item not found")
 	}
 
-	item, ok := items[itemIndex].(map[string]interface{})
-	if !ok {
-		return nil, middleware.NewInternalError("Invalid item format", nil)
+	// Create favorite object - copy item data without the itemId
+	itemData := make(map[string]interface{})
+	for k, v := range item {
+		if k != "itemId" {
+			itemData[k] = v
+		}
 	}
 
-	// Add source reference to the item
 	favoriteItem := map[string]interface{}{
-		"sourceOutputId":   outputID,
-		"sourceItemIndex":  itemIndex,
-		"sourceGroupName":  output.GroupName,
-		"title":            item["title"],
-		"body":             item["body"],
+		"itemId":         itemID,
+		"sourceOutputId": outputID,
+		"lens":           lensName,
+		"data":           itemData,
 	}
 
 	// Add to favorites
@@ -484,6 +486,42 @@ func (s *ClauserService) AddToFavorites(ctx context.Context, clauserID, userID, 
 
 	resp := toClauserOutputResponse(favorites)
 	return &resp, nil
+}
+
+// findItemByID searches for an item with the given itemId in lens output content
+// Returns the item, the lens name, and whether it was found
+func findItemByID(content map[string]interface{}, targetItemID string) (map[string]interface{}, string, bool) {
+	for lensName, lensData := range content {
+		if lensName == "terminator" {
+			continue
+		}
+
+		switch v := lensData.(type) {
+		case []interface{}:
+			// Direct array of items (e.g., differenceSummary, deltaResolutionMap)
+			for _, item := range v {
+				if itemMap, ok := item.(map[string]interface{}); ok {
+					if itemMap["itemId"] == targetItemID {
+						return itemMap, lensName, true
+					}
+				}
+			}
+		case map[string]interface{}:
+			// Object with nested arrays (e.g., frictionForecast with objections)
+			for _, val := range v {
+				if arr, ok := val.([]interface{}); ok {
+					for _, item := range arr {
+						if itemMap, ok := item.(map[string]interface{}); ok {
+							if itemMap["itemId"] == targetItemID {
+								return itemMap, lensName, true
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return nil, "", false
 }
 
 // RemoveFromFavorites removes an item from favorites
