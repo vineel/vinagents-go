@@ -46,6 +46,11 @@ func NewClauserWriteWorker(
 	}
 }
 
+// Timeout returns the timeout for clause write jobs
+func (w *ClauserWriteWorker) Timeout(job *river.Job[ClauserWriteArgs]) time.Duration {
+	return 5 * time.Minute
+}
+
 // Work executes a clause write job
 func (w *ClauserWriteWorker) Work(ctx context.Context, job *river.Job[ClauserWriteArgs]) error {
 	slog.Info("starting clauser write job", "clauserId", job.Args.ClauserID, "agentRunId", job.Args.AgentRunID)

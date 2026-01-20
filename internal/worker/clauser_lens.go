@@ -45,6 +45,11 @@ func NewClauserLensWorker(
 	}
 }
 
+// Timeout returns the timeout for lens analysis jobs
+func (w *ClauserLensWorker) Timeout(job *river.Job[ClauserLensArgs]) time.Duration {
+	return 5 * time.Minute
+}
+
 // Work executes a lens analysis job
 func (w *ClauserLensWorker) Work(ctx context.Context, job *river.Job[ClauserLensArgs]) error {
 	slog.Info("starting clauser lens job", "clauserId", job.Args.ClauserID, "lenses", job.Args.Lenses)

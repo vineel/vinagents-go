@@ -183,6 +183,38 @@ func (s *ClauserService) UpdateField(ctx context.Context, clauserID, userID, fie
 	return toClauserResponse(clauser), nil
 }
 
+// ClearRun cancels any active run and clears the agent_run_id on the clauser
+func (s *ClauserService) ClearRun(ctx context.Context, clauserID, userID string) (*ClauserResponse, error) {
+	// Verify ownership and get clauser
+	clauser, err := s.clauserRepo.FindByIDAndUserID(ctx, clauserID, userID)
+	if err != nil {
+		return nil, middleware.NewNotFoundError("Clauser not found")
+	}
+
+	// If there's an active run, mark it as cancelled
+	if clauser.AgentRunID != nil {
+		run, err := s.runRepo.FindByID(ctx, *clauser.AgentRunID)
+		if err == nil {
+			// Only cancel if still pending or running
+			if run.Status == repository.AgentRunStatusPending || run.Status == repository.AgentRunStatusRunning {
+				now := time.Now()
+				_, _ = s.runRepo.Update(ctx, run.AgentRunID, repository.UpdateAgentRunInput{
+					Status:      ptr(repository.AgentRunStatusCancelled),
+					CompletedAt: &now,
+				})
+			}
+		}
+	}
+
+	// Clear agent_run_id on clauser
+	clauser, err = s.clauserRepo.SetAgentRunID(ctx, clauserID, nil)
+	if err != nil {
+		return nil, middleware.NewInternalError("Failed to clear run", err)
+	}
+
+	return toClauserResponse(clauser), nil
+}
+
 // AppendClauseC appends a new clause C version to the history
 func (s *ClauserService) AppendClauseC(ctx context.Context, clauserID, userID, text string) (*ClauserResponse, error) {
 	// Verify ownership
@@ -524,4 +556,8 @@ func toClauserOutputResponse(o *repository.ClauserOutput) ClauserOutputResponse 
 		Content:         o.Content,
 		CreatedAt:       o.CreatedAt,
 	}
+}
+
+func ptr[T any](v T) *T {
+	return &v
 }

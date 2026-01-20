@@ -337,6 +337,23 @@ func (h *ClauserHandler) AppendClauseC(c *gin.Context) {
 	})
 }
 
+func (h *ClauserHandler) ClearRun(c *gin.Context) {
+	authUser := middleware.MustGetAuthUser(c)
+	clauserID := c.Param("id")
+
+	result, err := h.clauserService.ClearRun(c.Request.Context(), clauserID, authUser.UserID)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "success",
+		"data":    result,
+		"message": "Run cleared",
+	})
+}
+
 // RegisterRoutes registers clauser routes (all protected)
 func (h *ClauserHandler) RegisterRoutes(rg *gin.RouterGroup, authMiddleware gin.HandlerFunc) {
 	clausers := rg.Group("/clausers")
@@ -362,6 +379,7 @@ func (h *ClauserHandler) RegisterRoutes(rg *gin.RouterGroup, authMiddleware gin.
 		clausers.POST("/:id/run-lenses", h.RunLenses)
 		clausers.POST("/:id/rewrite", h.Rewrite)
 		clausers.POST("/:id/clause-c", h.AppendClauseC)
+		clausers.POST("/:id/clear-run", h.ClearRun)
 
 		clausers.GET("/:id/outputs", h.GetOutputs)
 		clausers.POST("/:id/outputs/:outputId/favorite", h.AddFavorite)
