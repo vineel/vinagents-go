@@ -83,8 +83,9 @@ Although you are seeking to find interest alignment, you always do so as if you 
 Generate a "Difference Summary" from clause_a to clause_b. Each line item in the difference summary could be expressed as "Changed X to Y because Z", and output like the following, For Example:
 {
   "differenceSummary": [
-    verb: "Changed", 
-    source: "X",
+    "priority": "high, medium, low or n/a",
+    "verb": "Changed", 
+    "source": "X",
     "dest": "Y",
     "reason_for_change":"Z"
   ]
@@ -99,6 +100,7 @@ For example:
 {
   "deltaResolutionMap": [
     {
+      "priority": "high, medium, low or n/a",
       "clause_a": "What Clause A does",
       "clause_b": "What Clause B does",
       "clause_c": "What aligned clause does",
@@ -119,6 +121,7 @@ For example:
     "score": 5,
     "objections": [
       {
+        "priority": "high, medium, low",
         "objection": "Likely counterparty objection",
         "response": "Principled, objective response script",
         "concessionLever": "Optional concession if helpful"
@@ -136,16 +139,16 @@ For example:
 {
   "implementationNotes": [
     {
-      priority: "high",
-      note: "Operational compliance requirement 3"
+      "priority": "high",
+      "note": "Operational compliance requirement 3"
     },
     {
-      priority: "medium",
-      note: "Operational compliance requirement 2"
+      "priority": "medium",
+      "note": "Operational compliance requirement 2"
     },
     {
-      priority: "low",
-      note: "Operational compliance requirement 1"
+      "priority": "low",
+      "note": "Operational compliance requirement 1"
     }
   ]
 }
@@ -222,17 +225,20 @@ The output must follow these rules EXACTLY
 * valid, machine readable JSON
 * no superfluous external markup, markdown, or anything else that would interfere with a JSON parser
 * must have exactly these keys, and only these keys, in this exact order:
+* each item must have a new UUID generated upon output in the itemId property.
 
 {
   "lenses": {
   {{if contains .Lenses "differenceSummary"}}"differenceSummary": [
-      verb: "", 
-      source: "",
+      "priority": "",
+      "verb": "", 
+      "source": "",
       "dest": "",
       "reason_for_change":""
     ],{{end}}
   {{if contains .Lenses "deltaResolutionMap"}}"deltaResolutionMap": [
       {
+        "priority": "",
         "clause_a": "",
         "clause_b": "",
         "clause_c": "",
@@ -241,6 +247,7 @@ The output must follow these rules EXACTLY
       }
     ],{{end}}
   {{if contains .Lenses "frictionForecast"}}"frictionForecast": {
+      "priority": "",
       "score": 5,
       "objections": [
         {
@@ -252,8 +259,8 @@ The output must follow these rules EXACTLY
     },{{end}}
   {{if contains .Lenses "implementationNotes"}}"implementationNotes": [
       {
-        priority: "",
-        note: ""
+        "priority": "",
+        "note": ""
       }
     ],{{end}}
   {{if contains .Lenses "internalNegotationNotes"}}"internalNegotationNotes": [
@@ -272,12 +279,12 @@ The output must follow these rules EXACTLY
       }
     ],{{end}}
   {{if contains .Lenses "externalNegotationNotes"}}"externalNegotationNotes": [
-      priority: "",
-      text: ""
+      "priority": "",
+      "text": ""
     ],{{end}}
   {{if contains .Lenses "openIssues"}}"openIssues": [
       {
-        priority: "",
+        "priority": "",
         text: ""
       }
     ],{{end}}
