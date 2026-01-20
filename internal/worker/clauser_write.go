@@ -300,13 +300,3 @@ func (w *ClauserWriteWorker) logMessage(ctx context.Context, agentRunID, level, 
 	}
 }
 
-func ptr[T any](v T) *T {
-	return &v
-}
-
-func deref(s *string) string {
-	if s == nil {
-		return ""
-	}
-	return *s
-}
