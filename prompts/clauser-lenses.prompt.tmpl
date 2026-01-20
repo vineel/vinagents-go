@@ -227,12 +227,12 @@ The output must follow these rules EXACTLY
 * valid, machine readable JSON
 * no superfluous external markup, markdown, or anything else that would interfere with a JSON parser
 * must have exactly these keys, and only these keys, in this exact order:
-* each item must have a new UUID generated upon output in the itemId property.
+* wherever you see UUID_PLACEHOLDER in the output, leave it as verbatim text in the generated object
 
 {
   "lenses": {
   {{if contains .Lenses "differenceSummary"}}"differenceSummary": [
-      "itemId": "new UUID",
+      "itemId": "UUID_PLACEHOLDER",
       "priority": "",
       "verb": "", 
       "source": "",
@@ -241,7 +241,7 @@ The output must follow these rules EXACTLY
     ],{{end}}
   {{if contains .Lenses "deltaResolutionMap"}}"deltaResolutionMap": [
       {
-        "itemId": "new UUID",
+        "itemId": "UUID_PLACEHOLDER",
         "priority": "",
         "clause_a": "",
         "clause_b": "",
@@ -254,7 +254,7 @@ The output must follow these rules EXACTLY
       "score": 5,
       "objections": [
         {
-          "itemId": "new UUID",
+          "itemId": "UUID_PLACEHOLDER",
           "priority": "",
           "objection": "",
           "response": "",
@@ -264,14 +264,14 @@ The output must follow these rules EXACTLY
     ],{{end}}
   {{if contains .Lenses "implementationNotes"}}"implementationNotes": [
       {
-        "itemId": "new UUID",
+        "itemId": "UUID_PLACEHOLDER",
         "priority": "",
         "note": ""
       }
     ],{{end}}
   {{if contains .Lenses "internalNegotationNotes"}}"internalNegotationNotes": [
       {
-        "itemId": "new UUID",
+        "itemId": "UUID_PLACEHOLDER",
         "priority":"",
         "text": "",
         "notes": [
@@ -286,20 +286,20 @@ The output must follow these rules EXACTLY
       }
     ],{{end}}
   {{if contains .Lenses "externalNegotationNotes"}}"externalNegotationNotes": [
-      "itemId": "new UUID",
+      "itemId": "UUID_PLACEHOLDER",
       "priority": "",
       "text": ""
     ],{{end}}
   {{if contains .Lenses "openIssues"}}"openIssues": [
       {
-        "itemId": "new UUID",
+        "itemId": "UUID_PLACEHOLDER",
         "priority": "",
         text: ""
       }
     ],{{end}}
   {{if contains .Lenses "dependentEdits"}}"dependentEdits": [
         {
-          "itemId": "new UUID",
+          "itemId": "UUID_PLACEHOLDER",
           "priority": "",
           "text": "",
           "location": ""

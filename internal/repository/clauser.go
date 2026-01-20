@@ -172,7 +172,8 @@ func (r *ClauserRepository) Update(ctx context.Context, clauserID string, input 
 	return r.scanClauser(r.pool.QueryRow(ctx, query, params...))
 }
 
-// UpdateField updates a single text field on a clauser
+// UpdateField updates a single text field on a clauser.
+// Empty string values are converted to NULL.
 func (r *ClauserRepository) UpdateField(ctx context.Context, clauserID, fieldName, value string) (*Clauser, error) {
 	allowedFields := map[string]bool{
 		"title":                  true,
@@ -191,6 +192,12 @@ func (r *ClauserRepository) UpdateField(ctx context.Context, clauserID, fieldNam
 		return nil, fmt.Errorf("invalid field name: %s", fieldName)
 	}
 
+	// Convert empty string to NULL
+	var valueParam interface{} = value
+	if value == "" {
+		valueParam = nil
+	}
+
 	query := fmt.Sprintf(`
 		UPDATE app.clausers
 		SET %s = $1
@@ -200,7 +207,7 @@ func (r *ClauserRepository) UpdateField(ctx context.Context, clauserID, fieldNam
 		          agent_run_id, clause_c_history, created_at, updated_at
 	`, fieldName)
 
-	return r.scanClauser(r.pool.QueryRow(ctx, query, value, clauserID))
+	return r.scanClauser(r.pool.QueryRow(ctx, query, valueParam, clauserID))
 }
 
 // AppendClauseCHistory appends a new clause C version to the history

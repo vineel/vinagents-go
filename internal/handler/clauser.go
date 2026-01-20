@@ -25,7 +25,7 @@ type createClauserRequest struct {
 }
 
 type updateFieldRequest struct {
-	Value string `json:"value" binding:"required"`
+	Value string `json:"value"`
 }
 
 type runLensesRequest struct {

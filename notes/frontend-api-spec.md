@@ -283,7 +283,16 @@ PUT /clausers/{clauserId}/{field-name}
 }
 ```
 
+- `value` - The new value for the field. **To clear a field, send an empty string (`""`)**. Empty strings are stored as `NULL` in the database.
+
 **Response (200):** Returns the updated Clauser object
+
+**Example - Clear a field:**
+```json
+{
+  "value": ""
+}
+```
 
 ### Available Field Endpoints
 
