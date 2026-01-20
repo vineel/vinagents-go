@@ -787,6 +787,55 @@ func TestAddFavorite_InvalidItemId(t *testing.T) {
 	assert.Equal(t, http.StatusNotFound, w.Code)
 }
 
+func TestAddFavorite_Idempotent(t *testing.T) {
+	env := testutil.SetupTestEnv(t)
+	env.ResetDatabase(t)
+
+	authResp, err := env.CreateTestUser(t, "idemfav@example.com", "password123")
+	require.NoError(t, err)
+
+	clauserID := createTestClauser(t, env, authResp.AccessToken, "Idempotent Fav Test")
+
+	// Create an output with lens-based structure
+	ctx := context.Background()
+	testItemID := "idempotent-test-item-id"
+	content, _ := json.Marshal(map[string]interface{}{
+		"risks": []map[string]interface{}{
+			{"itemId": testItemID, "priority": "high", "text": "Risk description"},
+		},
+	})
+
+	output, err := repository.NewClauserOutputRepository(env.Pool).Create(ctx, repository.CreateClauserOutputInput{
+		ClauserID:    clauserID,
+		Ordinal:      1,
+		GroupName:    "lenses",
+		GroupOrdinal: 0,
+		Title:        "Lens Analysis",
+		Kind:         "lens_output",
+		Content:      content,
+	})
+	require.NoError(t, err)
+
+	body := map[string]interface{}{
+		"itemId": testItemID,
+	}
+
+	// Add favorite first time
+	w1 := env.Request("POST", "/api/v1/clausers/"+clauserID+"/outputs/"+output.ClauserOutputID+"/favorite", body, authResp.AccessToken)
+	assert.Equal(t, http.StatusOK, w1.Code)
+
+	// Add same favorite second time - should succeed without duplicating
+	w2 := env.Request("POST", "/api/v1/clausers/"+clauserID+"/outputs/"+output.ClauserOutputID+"/favorite", body, authResp.AccessToken)
+	assert.Equal(t, http.StatusOK, w2.Code)
+
+	var resp map[string]interface{}
+	testutil.ParseResponse(t, w2, &resp)
+
+	data := resp["data"].(map[string]interface{})
+	items := data["content"].(map[string]interface{})["items"].([]interface{})
+	assert.Len(t, items, 1) // Should still be 1, not 2
+}
+
 func TestRemoveFavorite_Success(t *testing.T) {
 	env := testutil.SetupTestEnv(t)
 	env.ResetDatabase(t)

@@ -155,6 +155,7 @@ func (r *ClauserOutputRepository) GetOrCreateFavorites(ctx context.Context, clau
 }
 
 // AppendFavorite adds an item to the favorites content
+// If the itemId already exists, returns the current favorites without duplicating
 func (r *ClauserOutputRepository) AppendFavorite(ctx context.Context, clauserID string, item map[string]interface{}) (*ClauserOutput, error) {
 	favorites, err := r.GetOrCreateFavorites(ctx, clauserID)
 	if err != nil {
@@ -170,6 +171,18 @@ func (r *ClauserOutputRepository) AppendFavorite(ctx context.Context, clauserID 
 	items, ok := content["items"].([]interface{})
 	if !ok {
 		items = []interface{}{}
+	}
+
+	// Check if itemId already exists - if so, return current favorites (idempotent)
+	newItemID, _ := item["itemId"].(string)
+	if newItemID != "" {
+		for _, existing := range items {
+			if existingMap, ok := existing.(map[string]interface{}); ok {
+				if existingMap["itemId"] == newItemID {
+					return favorites, nil
+				}
+			}
+		}
 	}
 
 	items = append(items, item)
