@@ -160,6 +160,16 @@ func (w *ClauserWriteWorker) execute(ctx context.Context, args ClauserWriteArgs)
 		}
 	}
 
+	// Parse JSON response and extract clause_c
+	jsonText := extractJSON(clauseText)
+	var parsed struct {
+		ClauseC string `json:"clause_c"`
+	}
+	if err := json.Unmarshal([]byte(jsonText), &parsed); err != nil {
+		return fmt.Errorf("failed to parse clause response JSON: %w", err)
+	}
+	clauseText = parsed.ClauseC
+
 	// Dump raw response to file for debugging
 	responseFilename := fmt.Sprintf("write_%s_2_response.txt", timestamp)
 	responsePath := filepath.Join("output", responseFilename)
